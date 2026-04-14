@@ -18,7 +18,7 @@ exports.handler = async (event) => {
 
 Rules:
 - Do NOT just transliterate (Michael → 마이클 is WRONG)
-- Create a proper 2-syllable Korean name that sounds similar to the original
+- Create a 3-syllable Korean name - The FIRST syllable must be the first sound of the original name (e.g. Angela → 안, Michael → 마, Dominic → 도) - This first syllable acts as the family name - The remaining 2 syllables are the given name - Example: Angela → 안지연, Michael → 마이현, Dominic → 도민혁 that sounds similar to the original
 - Choose Hanja with beautiful positive meanings
 - Should sound like a real Korean person's name
 - Example: Michael → 미현, Dominic → 도민, Angela → 안지
