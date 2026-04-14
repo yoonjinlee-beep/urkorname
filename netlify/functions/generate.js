@@ -14,8 +14,26 @@ exports.handler = async (event) => {
       };
     }
 
-    const prompt = `Create a beautiful Korean name for the foreign name: "${name}"
+const prompt = `You are a Korean naming expert. Create a REAL Korean name for someone named "${name}".
 
+Rules:
+- Do NOT transliterate the name directly (e.g. Michael → 마이클 is WRONG)
+- Create a proper Korean name that sounds phonetically SIMILAR to the original
+- Use 2 syllables for the given name (like real Korean names: 민준, 서연, 지훈)
+- Choose Hanja with beautiful, positive meanings
+- The result should sound like a real Korean person's name
+
+Example: Michael → 미현 (not 마이클), Dominic → 도민 (not 도미닉)
+
+Reply ONLY with a JSON object, no markdown:
+{
+  "transliteration": "phonetic Korean spelling of original name (e.g. 마이클)",
+  "romanization": "romanized Korean name with dots (e.g. Mi · Hyun)",
+  "characters": [
+    { "hangul": "미", "hanja": "美", "meaning": "beautiful" },
+    { "hangul": "현", "hanja": "賢", "meaning": "wise" }
+  ]
+}`;
 Reply ONLY with a JSON object, no markdown:
 {
   "transliteration": "phonetic Korean spelling (e.g. 도미닉)",
