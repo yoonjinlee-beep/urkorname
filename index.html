@@ -42,26 +42,46 @@
     .hanja-block { display: flex; flex-direction: column; align-items: center; margin-top: 10px; gap: 3px; }
     .hanja-char-sm { font-family: var(--font-korean); font-size: 0.85rem; color: #aaa; line-height: 1; }
     .hanja-meaning-sm { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; }
-    #roman { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; margin-bottom: 3rem; opacity: 0; transition: opacity 0.5s ease; }
+    #roman { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; margin-bottom: 2rem; opacity: 0; transition: opacity 0.5s ease; }
     #roman.show { opacity: 1; }
-    #tryAgain { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; padding: 0; opacity: 0; transition: opacity 0.4s ease, color 0.2s; }
-    #tryAgain:hover { color: var(--black); }
-    #tryAgain.show { opacity: 1; }
+    .action-btns { display: flex; gap: 2rem; align-items: center; opacity: 0; transition: opacity 0.4s ease; margin-bottom: 1rem; }
+    .action-btns.show { opacity: 1; }
+    .btn-practice { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--white); background: var(--black); border: none; cursor: pointer; padding: 10px 20px; transition: background 0.2s; }
+    .btn-practice:hover { background: var(--red); }
+    .btn-again { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; padding: 0; transition: color 0.2s; }
+    .btn-again:hover { color: var(--black); }
+    #practicePage { display: none; min-height: 100vh; padding: 4rem clamp(2rem, 10vw, 10rem); max-width: 900px; }
+    .practice-title { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 3rem; }
+    .char-tabs { display: flex; gap: 1rem; margin-bottom: 3rem; }
+    .char-tab { font-family: var(--font-korean); font-size: 2rem; font-weight: 900; cursor: pointer; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; transition: all 0.2s; color: var(--gray-mid); }
+    .char-tab.active { color: var(--black); border-bottom-color: var(--black); }
+    .practice-area { display: flex; gap: 4rem; align-items: flex-start; flex-wrap: wrap; }
+    .guide-char { position: relative; width: 240px; height: 240px; flex-shrink: 0; }
+    .guide-char canvas { position: absolute; top: 0; left: 0; border-radius: 4px; }
+    .guide-canvas { opacity: 0.08; }
+    .draw-canvas { cursor: crosshair; }
+    .practice-info { flex: 1; min-width: 200px; }
+    .practice-char-display { font-family: var(--font-korean); font-size: 6rem; font-weight: 900; line-height: 1; margin-bottom: 1rem; }
+    .practice-hanja { font-family: var(--font-korean); font-size: 1.5rem; color: #aaa; margin-bottom: 0.3rem; }
+    .practice-meaning { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; margin-bottom: 2rem; }
+    .practice-tip { font-size: 11px; color: #bbb; line-height: 1.6; margin-bottom: 2rem; max-width: 240px; }
+    .btn-clear { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; background: none; border: 1px solid var(--gray-light); cursor: pointer; padding: 8px 16px; transition: all 0.2s; margin-right: 1rem; }
+    .btn-clear:hover { color: var(--black); border-color: var(--black); }
+    .btn-back { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; padding: 0; transition: color 0.2s; }
+    .btn-back:hover { color: var(--black); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes pulse { 0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
-    @media (max-width: 600px) { .page { padding: 3rem 1.5rem 6rem; } .site-title { margin-bottom: 3rem; } .hint { margin-bottom: 2.5rem; } }
+    @media (max-width: 600px) { .page { padding: 3rem 1.5rem 6rem; } .practice-area { gap: 2rem; } .guide-char { width: 180px; height: 180px; } }
   </style>
 </head>
 <body>
-  <div class="page">
+  <div class="page" id="mainPage">
     <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
     <div class="input-label">Enter your name</div>
     <input id="nameInput" type="text" placeholder="e.g. Dominic" autocomplete="off" spellcheck="false" />
     <div class="hint">Press Enter ↵</div>
     <div class="loader" id="loader">
-      <div class="loader-dot"></div>
-      <div class="loader-dot"></div>
-      <div class="loader-dot"></div>
+      <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
     </div>
     <div id="results">
       <div class="step-label">Sounds like</div>
@@ -70,23 +90,46 @@
       <div class="step-label">Your Korean name</div>
       <div id="koreanRow"></div>
       <div id="roman"></div>
-      <button id="tryAgain" onclick="reset()">← Try another name</button>
+      <div class="action-btns" id="actionBtns">
+        <button class="btn-practice" onclick="openPractice()">✏ Practice writing</button>
+        <button class="btn-again" onclick="reset()">← Try another name</button>
+      </div>
+    </div>
+  </div>
+  <div id="practicePage">
+    <div class="practice-title">나의 한국 이름 &mdash; Practice Writing</div>
+    <div class="char-tabs" id="charTabs"></div>
+    <div class="practice-area">
+      <div class="guide-char">
+        <canvas class="guide-canvas" id="guideCanvas" width="240" height="240"></canvas>
+        <canvas class="draw-canvas" id="drawCanvas" width="240" height="240"></canvas>
+      </div>
+      <div class="practice-info">
+        <div class="practice-char-display" id="practiceCharDisplay"></div>
+        <div class="practice-hanja" id="practiceHanja"></div>
+        <div class="practice-meaning" id="practiceMeaning"></div>
+        <div class="practice-tip">Draw the character on the canvas. Trace over the guide!</div>
+        <button class="btn-clear" onclick="clearCanvas()">Clear</button>
+        <button class="btn-back" onclick="closePractice()">← Back to my name</button>
+      </div>
     </div>
   </div>
   <script>
     const OBANGSAEK = ['#1A4A8A', '#C84B31', '#C8960C', '#2E7D32', '#555555'];
+    let currentChars = [], isDrawing = false, lastX = 0, lastY = 0;
     function show(el, delay) { setTimeout(() => el.classList.add('show'), delay); }
     function reset() {
       const inp = document.getElementById('nameInput');
       document.getElementById('results').style.display = 'none';
       document.getElementById('loader').classList.remove('active');
-      ['translit', 'divider', 'roman'].forEach(id => document.getElementById(id).classList.remove('show'));
+      ['translit','divider','roman'].forEach(id => document.getElementById(id).classList.remove('show'));
       document.getElementById('koreanRow').innerHTML = '';
-      document.getElementById('tryAgain').classList.remove('show');
+      document.getElementById('actionBtns').classList.remove('show');
       inp.disabled = false; inp.value = ''; inp.focus();
     }
     function renderResult(data) {
       document.getElementById('results').style.display = 'block';
+      currentChars = data.characters;
       const translit = document.getElementById('translit');
       translit.textContent = data.transliteration;
       show(translit, 100);
@@ -95,14 +138,13 @@
       data.characters.forEach((ch, i) => {
         const unit = document.createElement('div');
         unit.className = 'char-unit';
-        unit.innerHTML = `<span style="color:${OBANGSAEK[i % OBANGSAEK.length]};line-height:1;">${ch.hangul}</span><div class="hanja-block"><span class="hanja-char-sm">${ch.hanja}</span><span class="hanja-meaning-sm">${ch.meaning}</span></div>`;
+        unit.innerHTML = `<span style="color:${OBANGSAEK[i%OBANGSAEK.length]};line-height:1;">${ch.hangul}</span><div class="hanja-block"><span class="hanja-char-sm">${ch.hanja}</span><span class="hanja-meaning-sm">${ch.meaning}</span></div>`;
         row.appendChild(unit);
         show(unit, 720 + i * 300);
       });
-      const roman = document.getElementById('roman');
-      roman.textContent = data.romanization;
-      show(roman, 720 + data.characters.length * 300 + 100);
-      setTimeout(() => document.getElementById('tryAgain').classList.add('show'), 720 + data.characters.length * 300 + 500);
+      show(document.getElementById('roman'), 720 + data.characters.length * 300 + 100);
+      document.getElementById('roman').textContent = data.romanization;
+      setTimeout(() => document.getElementById('actionBtns').classList.add('show'), 720 + data.characters.length * 300 + 500);
     }
     async function handleSubmit() {
       const inp = document.getElementById('nameInput');
@@ -112,11 +154,7 @@
       document.getElementById('loader').classList.add('active');
       document.getElementById('results').style.display = 'none';
       try {
-        const res = await fetch('/.netlify/functions/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
-        });
+        const res = await fetch('/.netlify/functions/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
         if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Something went wrong'); }
         const parsed = await res.json();
         document.getElementById('loader').classList.remove('active');
@@ -127,8 +165,62 @@
         alert('Something went wrong 😢\n' + (err.message || 'Please try again.'));
       }
     }
-    document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
-    window.addEventListener('load', () => { document.getElementById('nameInput').focus(); });
+    function openPractice() {
+      document.getElementById('mainPage').style.display = 'none';
+      document.getElementById('practicePage').style.display = 'block';
+      const tabs = document.getElementById('charTabs');
+      tabs.innerHTML = '';
+      currentChars.forEach((ch, i) => {
+        const tab = document.createElement('div');
+        tab.className = 'char-tab' + (i === 0 ? ' active' : '');
+        tab.textContent = ch.hangul;
+        tab.onclick = () => selectChar(i);
+        tabs.appendChild(tab);
+      });
+      selectChar(0);
+    }
+    function closePractice() {
+      document.getElementById('practicePage').style.display = 'none';
+      document.getElementById('mainPage').style.display = 'flex';
+    }
+    function selectChar(i) {
+      const ch = currentChars[i];
+      document.querySelectorAll('.char-tab').forEach((t, j) => { t.classList.toggle('active', j === i); t.style.color = j === i ? OBANGSAEK[i%OBANGSAEK.length] : ''; });
+      document.getElementById('practiceCharDisplay').textContent = ch.hangul;
+      document.getElementById('practiceCharDisplay').style.color = OBANGSAEK[i%OBANGSAEK.length];
+      document.getElementById('practiceHanja').textContent = ch.hanja;
+      document.getElementById('practiceMeaning').textContent = ch.meaning;
+      const gc = document.getElementById('guideCanvas');
+      const gctx = gc.getContext('2d');
+      const s = gc.width;
+      gctx.clearRect(0,0,s,s);
+      gctx.strokeStyle='#e0e0e0'; gctx.lineWidth=0.5;
+      gctx.beginPath(); gctx.moveTo(s/2,0); gctx.lineTo(s/2,s); gctx.moveTo(0,s/2); gctx.lineTo(s,s/2); gctx.stroke();
+      gctx.fillStyle = OBANGSAEK[i%OBANGSAEK.length];
+      gctx.font = `${s*0.75}px 'Noto Serif KR', serif`;
+      gctx.textAlign='center'; gctx.textBaseline='middle';
+      gctx.fillText(ch.hangul, s/2, s/2 + s*0.04);
+      clearCanvas();
+    }
+    function clearCanvas() { const c = document.getElementById('drawCanvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+    function getPos(e, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
+      if (e.touches) return { x:(e.touches[0].clientX-rect.left)*sx, y:(e.touches[0].clientY-rect.top)*sy };
+      return { x:(e.clientX-rect.left)*sx, y:(e.clientY-rect.top)*sy };
+    }
+    function setupDrawing() {
+      const canvas = document.getElementById('drawCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle='#0a0a0a'; ctx.lineWidth=6; ctx.lineCap='round'; ctx.lineJoin='round';
+      function start(e) { e.preventDefault(); isDrawing=true; const p=getPos(e,canvas); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(lastX,lastY,3,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill(); }
+      function draw(e) { e.preventDefault(); if(!isDrawing) return; const p=getPos(e,canvas); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; }
+      function stop(e) { e.preventDefault(); isDrawing=false; }
+      canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',draw); canvas.addEventListener('mouseup',stop); canvas.addEventListener('mouseleave',stop);
+      canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',draw,{passive:false}); canvas.addEventListener('touchend',stop,{passive:false});
+    }
+    document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') handleSubmit(); });
+    window.addEventListener('load', () => { document.getElementById('nameInput').focus(); setupDrawing(); });
   </script>
 </body>
 </html>
