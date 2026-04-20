@@ -1,4 +1,7 @@
-exports.handler = async (event) => {
+- The result must sound like a name a real Korean person would actually have
+- Use only common Korean name syllables (e.g. 민, 준, 서, 연, 지, 현, 혁, 윤, 채, 은, 아, 영, 수, 진, 희)
+- Avoid unusual or awkward combinations that no Korean would use
+  exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
