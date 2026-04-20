@@ -1,7 +1,4 @@
-- The result must sound like a name a real Korean person would actually have
-- Use only common Korean name syllables (e.g. 민, 준, 서, 연, 지, 현, 혁, 윤, 채, 은, 아, 영, 수, 진, 희)
-- Avoid unusual or awkward combinations that no Korean would use
-  exports.handler = async (event) => {
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -20,6 +17,9 @@
     const prompt = `You are a Korean naming expert. Create a REAL Korean name for someone named "${name}".
 
 Rules:
+- The result must sound like a name a real Korean person would actually have
+- Use only common Korean name syllables (e.g. 민, 준, 서, 연, 지, 현, 혁, 윤, 채, 은, 아, 영, 수, 진, 희)
+- Avoid unusual or awkward combinations that no Korean would use
 - Do NOT just transliterate (Michael → 마이클 is WRONG)
 - Create a 3-syllable Korean name - The FIRST syllable must be the first sound of the original name (e.g. Angela → 안, Michael → 마, Dominic → 도) - This first syllable acts as the family name - The remaining 2 syllables are the given name - Example: Angela → 안지연, Michael → 마이현, Dominic → 도민혁 that sounds similar to the original
 - Choose Hanja with beautiful positive meanings
