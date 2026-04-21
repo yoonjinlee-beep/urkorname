@@ -4,223 +4,526 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>나의 한국 이름</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #0a0a0a; --white: #ffffff; --gray-light: #e0e0e0;
-      --gray-mid: #aaa; --gray-hint: #ddd;
+      --black: #0a0a0a; --white: #ffffff;
+      --gray-light: #e0e0e0; --gray-mid: #aaa; --gray-hint: #ddd;
       --blue: #1A4A8A; --red: #C84B31; --yellow: #C8960C; --green: #2E7D32;
-      --font-mono: 'IBM Plex Mono', monospace;
-      --font-korean: 'Noto Serif KR', serif;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-korean: 'Noto Sans KR', sans-serif;
     }
-    html, body { min-height: 100%; background: var(--white); color: var(--black); font-family: var(--font-mono); -webkit-font-smoothing: antialiased; }
-    .page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 5rem clamp(2rem, 10vw, 10rem); max-width: 900px; padding-bottom: 6rem; }
-    .site-title { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 5rem; opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards; }
+    html, body { min-height: 100%; background: var(--white); color: var(--black); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+
+    /* ── MAIN PAGE ── */
+    #mainPage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem clamp(1.5rem, 8vw, 8rem); padding-bottom: 6rem; text-align: center; }
+    .site-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 5rem; opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards; }
     .input-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 0.6rem; opacity: 0; animation: fadeUp 0.9s 0.2s ease forwards; }
-    #nameInput { font-family: var(--font-mono); font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 500; color: var(--black); background: transparent; border: none; border-bottom: 1.5px solid var(--gray-light); outline: none; width: 100%; padding-bottom: 0.55rem; transition: border-color 0.25s; caret-color: var(--red); opacity: 0; animation: fadeUp 0.9s 0.25s ease forwards; }
+    #nameInput { font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 4.5rem); color: var(--black); background: transparent; border: none; border-bottom: 1.5px solid var(--gray-light); outline: none; width: 100%; max-width: 500px; padding-bottom: 0.4rem; text-align: center; letter-spacing: 0.08em; transition: border-color 0.25s; caret-color: var(--red); opacity: 0; animation: fadeUp 0.9s 0.25s ease forwards; }
     #nameInput:focus { border-bottom-color: var(--black); }
     #nameInput::placeholder { color: var(--gray-hint); }
-    #nameInput:disabled { opacity: 0.35; cursor: not-allowed; }
-    .hint { font-size: 10px; letter-spacing: 0.12em; color: var(--gray-hint); margin-top: 0.55rem; margin-bottom: 4rem; opacity: 0; animation: fadeUp 0.9s 0.3s ease forwards; }
-    .loader { display: none; gap: 7px; align-items: center; height: 28px; margin-bottom: 1rem; }
+    #nameInput:disabled { opacity: 0.35; }
+    .hint { font-size: 10px; letter-spacing: 0.12em; color: var(--gray-hint); margin-top: 0.5rem; margin-bottom: 4rem; opacity: 0; animation: fadeUp 0.9s 0.3s ease forwards; }
+    .loader { display: none; gap: 7px; align-items: center; justify-content: center; height: 28px; margin-bottom: 1rem; }
     .loader.active { display: flex; }
     .loader-dot { width: 7px; height: 7px; border-radius: 50%; animation: pulse 1.3s ease-in-out infinite; }
     .loader-dot:nth-child(1) { background: var(--blue); animation-delay: 0s; }
     .loader-dot:nth-child(2) { background: var(--red); animation-delay: 0.22s; }
     .loader-dot:nth-child(3) { background: var(--yellow); animation-delay: 0.44s; }
-    #results { display: none; }
-    .step-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #ccc; margin-bottom: 0.45rem; }
-    #translit { font-family: var(--font-korean); font-size: clamp(1.2rem, 2.5vw, 1.55rem); color: #ccc; margin-bottom: 2.5rem; opacity: 0; transform: translateY(10px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    #results { display: none; width: 100%; max-width: 600px; }
+    .step-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #ccc; margin-bottom: 0.4rem; }
+    #translit { font-family: var(--font-korean); font-size: clamp(1rem, 2vw, 1.3rem); color: #ccc; margin-bottom: 2rem; opacity: 0; transform: translateY(8px); transition: opacity 0.6s, transform 0.6s; }
     #translit.show { opacity: 1; transform: translateY(0); }
-    #divider { width: 36px; height: 1px; background: var(--gray-light); margin-bottom: 2.5rem; opacity: 0; transition: opacity 0.5s ease 0.35s; }
+    #divider { width: 32px; height: 1px; background: var(--gray-light); margin: 0 auto 2rem; opacity: 0; transition: opacity 0.5s 0.35s; }
     #divider.show { opacity: 1; }
-    #koreanRow { display: flex; gap: clamp(0.4rem, 2vw, 1rem); align-items: flex-start; margin-bottom: 1rem; font-family: var(--font-korean); font-size: clamp(3rem, 9vw, 6rem); font-weight: 900; line-height: 1; }
-    .char-unit { display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(16px); transition: opacity 0.45s ease, transform 0.45s ease; }
+    #koreanRow { display: flex; justify-content: center; gap: clamp(0.5rem, 3vw, 1.5rem); margin-bottom: 0.8rem; }
+    .char-unit { display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(14px); transition: opacity 0.45s, transform 0.45s; cursor: pointer; }
     .char-unit.show { opacity: 1; transform: translateY(0); }
-    .hanja-block { display: flex; flex-direction: column; align-items: center; margin-top: 10px; gap: 3px; }
-    .hanja-char-sm { font-family: var(--font-korean); font-size: 0.85rem; color: #aaa; line-height: 1; }
-    .hanja-meaning-sm { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; }
-    #roman { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; margin-bottom: 2rem; opacity: 0; transition: opacity 0.5s ease; }
+    .hangul-char { font-family: var(--font-korean); font-weight: 900; font-size: clamp(4rem, 12vw, 7rem); line-height: 1; transition: transform 0.15s ease, opacity 0.15s ease; display: block; }
+    .char-unit:hover .hangul-char { transform: scale(1.06); opacity: 0.7; }
+    .sound-hint { font-size: 8px; letter-spacing: 0.1em; color: #ddd; text-transform: uppercase; margin-top: 2px; opacity: 0; transition: opacity 0.2s; }
+    .char-unit:hover .sound-hint { opacity: 1; }
+    .hanja-block { display: flex; flex-direction: column; align-items: center; margin-top: 8px; gap: 2px; }
+    .hanja-sm { font-family: var(--font-korean); font-size: 0.8rem; color: #aaa; line-height: 1; }
+    .meaning-sm { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); }
+    #roman { font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase; color: #bbb; margin-bottom: 2.5rem; font-family: var(--font-display); opacity: 0; transition: opacity 0.5s; }
     #roman.show { opacity: 1; }
-    .action-btns { display: flex; gap: 2rem; align-items: center; opacity: 0; transition: opacity 0.4s ease; margin-bottom: 1rem; }
+    .action-btns { display: flex; gap: 1.5rem; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s; flex-wrap: wrap; }
     .action-btns.show { opacity: 1; }
-    .btn-practice { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--white); background: var(--black); border: none; cursor: pointer; padding: 10px 20px; transition: background 0.2s; }
-    .btn-practice:hover { background: var(--red); }
-    .btn-again { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; padding: 0; transition: color 0.2s; }
-    .btn-again:hover { color: var(--black); }
-    #practicePage { display: none; min-height: 100vh; padding: 4rem clamp(2rem, 10vw, 10rem); max-width: 900px; }
-    .practice-title { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 3rem; }
-    .char-tabs { display: flex; gap: 1rem; margin-bottom: 3rem; }
-    .char-tab { font-family: var(--font-korean); font-size: 2rem; font-weight: 900; cursor: pointer; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; transition: all 0.2s; color: var(--gray-mid); }
-    .char-tab.active { color: var(--black); border-bottom-color: var(--black); }
-    .practice-area { display: flex; gap: 4rem; align-items: flex-start; flex-wrap: wrap; }
-    .guide-char { position: relative; width: 240px; height: 240px; flex-shrink: 0; }
-    .guide-char canvas { position: absolute; top: 0; left: 0; border-radius: 4px; }
-    .guide-canvas { opacity: 0.08; }
-    .draw-canvas { cursor: crosshair; }
-    .practice-info { flex: 1; min-width: 200px; }
-    .practice-char-display { font-family: var(--font-korean); font-size: 6rem; font-weight: 900; line-height: 1; margin-bottom: 1rem; }
-    .practice-hanja { font-family: var(--font-korean); font-size: 1.5rem; color: #aaa; margin-bottom: 0.3rem; }
-    .practice-meaning { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; margin-bottom: 2rem; }
-    .practice-tip { font-size: 11px; color: #bbb; line-height: 1.6; margin-bottom: 2rem; max-width: 240px; }
-    .btn-clear { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; background: none; border: 1px solid var(--gray-light); cursor: pointer; padding: 8px 16px; transition: all 0.2s; margin-right: 1rem; }
+    .btn-primary { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; background: var(--black); color: white; border: none; padding: 11px 24px; cursor: pointer; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--red); }
+    .btn-ghost { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 0; }
+    .btn-ghost:hover { color: var(--black); }
+
+    /* ── PRACTICE PAGE ── */
+    #practicePage { display: none; min-height: 100vh; padding: 4rem clamp(1.5rem, 8vw, 8rem); max-width: 900px; margin: 0 auto; }
+    .practice-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
+    .practice-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray-mid); }
+    .char-tabs { display: flex; gap: 0.5rem; }
+    .char-tab { font-family: var(--font-korean); font-weight: 900; font-size: 1.8rem; cursor: pointer; padding: 0.3rem 0.8rem; border-bottom: 2px solid transparent; transition: all 0.2s; color: var(--gray-mid); }
+    .char-tab.active { border-bottom-color: currentColor; }
+    .practice-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    @media (max-width: 640px) { .practice-body { grid-template-columns: 1fr; gap: 2rem; } }
+
+    /* Canvas area */
+    .canvas-section { display: flex; flex-direction: column; gap: 1rem; }
+    .canvas-wrap { position: relative; width: 100%; aspect-ratio: 1; max-width: 320px; }
+    .canvas-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 2px; }
+    .canvas-guide { opacity: 0.07; }
+    .canvas-draw { cursor: crosshair; }
+    .canvas-controls { display: flex; gap: 1rem; align-items: center; }
+    .btn-clear { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; background: none; border: 1px solid var(--gray-light); cursor: pointer; padding: 7px 14px; transition: all 0.2s; }
     .btn-clear:hover { color: var(--black); border-color: var(--black); }
-    .btn-back { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; padding: 0; transition: color 0.2s; }
-    .btn-back:hover { color: var(--black); }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
-    @media (max-width: 600px) { .page { padding: 3rem 1.5rem 6rem; } .practice-area { gap: 2rem; } .guide-char { width: 180px; height: 180px; } }
+    .btn-score { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: white; background: var(--black); border: none; cursor: pointer; padding: 7px 14px; transition: background 0.2s; }
+    .btn-score:hover { background: var(--blue); }
+    .score-display { font-size: 10px; letter-spacing: 0.1em; color: #aaa; font-family: var(--font-display); margin-top: 0.5rem; min-height: 20px; }
+    .score-bar { height: 3px; background: var(--gray-light); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 2px; width: 0; transition: width 0.8s ease; }
+
+    /* Info section */
+    .info-section { padding-top: 0.5rem; }
+    .char-big { font-family: var(--font-korean); font-weight: 900; font-size: 7rem; line-height: 1; margin-bottom: 0.8rem; }
+    .char-hanja { font-family: var(--font-korean); font-size: 1.2rem; color: #aaa; margin-bottom: 0.2rem; }
+    .char-meaning { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 2rem; }
+
+    /* Stroke order */
+    .stroke-order-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 0.8rem; }
+    .stroke-steps { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .stroke-step { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .stroke-canvas { border: 0.5px solid #eee; border-radius: 2px; }
+    .stroke-num { font-size: 8px; color: #ccc; font-family: var(--font-display); letter-spacing: 0.05em; }
+
+    .btn-back-wrap { margin-top: 3rem; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes pulse { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
   </style>
 </head>
 <body>
-  <div class="page" id="mainPage">
-    <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
-    <div class="input-label">Enter your name</div>
-    <input id="nameInput" type="text" placeholder="e.g. Dominic" autocomplete="off" spellcheck="false" />
-    <div class="hint">Press Enter ↵</div>
-    <div class="loader" id="loader">
-      <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
-    </div>
-    <div id="results">
-      <div class="step-label">Sounds like</div>
-      <div id="translit"></div>
-      <div id="divider"></div>
-      <div class="step-label">Your Korean name</div>
-      <div id="koreanRow"></div>
-      <div id="roman"></div>
-      <div class="action-btns" id="actionBtns">
-        <button class="btn-practice" onclick="openPractice()">✏ Practice writing</button>
-        <button class="btn-again" onclick="reset()">← Try another name</button>
-      </div>
+
+<!-- MAIN PAGE -->
+<div id="mainPage">
+  <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
+  <div class="input-label">Enter your name</div>
+  <input id="nameInput" type="text" placeholder="e.g. Dominic" autocomplete="off" spellcheck="false" />
+  <div class="hint">Press Enter ↵</div>
+  <div class="loader" id="loader">
+    <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+  </div>
+  <div id="results">
+    <div class="step-label">Sounds like</div>
+    <div id="translit"></div>
+    <div id="divider"></div>
+    <div class="step-label">Your Korean name</div>
+    <div id="koreanRow"></div>
+    <div id="roman"></div>
+    <div class="action-btns" id="actionBtns">
+      <button class="btn-primary" onclick="openPractice()">✏ Practice writing</button>
+      <button class="btn-ghost" onclick="resetMain()">← Try another name</button>
     </div>
   </div>
-  <div id="practicePage">
-    <div class="practice-title">나의 한국 이름 &mdash; Practice Writing</div>
+</div>
+
+<!-- PRACTICE PAGE -->
+<div id="practicePage">
+  <div class="practice-header">
+    <div class="practice-title">Practice writing — 획순 따라쓰기</div>
     <div class="char-tabs" id="charTabs"></div>
-    <div class="practice-area">
-      <div class="guide-char">
-        <canvas class="guide-canvas" id="guideCanvas" width="240" height="240"></canvas>
-        <canvas class="draw-canvas" id="drawCanvas" width="240" height="240"></canvas>
+  </div>
+  <div class="practice-body">
+    <div class="canvas-section">
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="guideCanvas" class="canvas-guide"></canvas>
+        <canvas id="drawCanvas" class="canvas-draw"></canvas>
       </div>
-      <div class="practice-info">
-        <div class="practice-char-display" id="practiceCharDisplay"></div>
-        <div class="practice-hanja" id="practiceHanja"></div>
-        <div class="practice-meaning" id="practiceMeaning"></div>
-        <div class="practice-tip">Draw the character on the canvas. Trace over the guide!</div>
-        <button class="btn-clear" onclick="clearCanvas()">Clear</button>
-        <button class="btn-back" onclick="closePractice()">← Back to my name</button>
+      <div class="canvas-controls">
+        <button class="btn-clear" onclick="clearDraw()">Clear</button>
+        <button class="btn-score" onclick="scoreDrawing()">Check score</button>
+      </div>
+      <div class="score-display" id="scoreDisplay"></div>
+      <div class="score-bar"><div class="score-fill" id="scoreFill"></div></div>
+    </div>
+    <div class="info-section">
+      <div class="char-big" id="practiceCharBig"></div>
+      <div class="char-hanja" id="practiceHanja"></div>
+      <div class="char-meaning" id="practiceMeaning"></div>
+      <div class="stroke-order-title">Stroke order — 획순</div>
+      <div class="stroke-steps" id="strokeSteps"></div>
+      <div class="btn-back-wrap">
+        <button class="btn-ghost" onclick="closePractice()">← Back to my name</button>
       </div>
     </div>
   </div>
-  <script>
-    const OBANGSAEK = ['#1A4A8A', '#C84B31', '#C8960C', '#2E7D32', '#555555'];
-    let currentChars = [], isDrawing = false, lastX = 0, lastY = 0;
-    function show(el, delay) { setTimeout(() => el.classList.add('show'), delay); }
-    function reset() {
-      const inp = document.getElementById('nameInput');
-      document.getElementById('results').style.display = 'none';
-      document.getElementById('loader').classList.remove('active');
-      ['translit','divider','roman'].forEach(id => document.getElementById(id).classList.remove('show'));
-      document.getElementById('koreanRow').innerHTML = '';
-      document.getElementById('actionBtns').classList.remove('show');
-      inp.disabled = false; inp.value = ''; inp.focus();
+</div>
+
+<script>
+const OBANGSAEK = ['#1A4A8A','#C84B31','#C8960C','#2E7D32','#555'];
+let currentChars = [];
+let currentIdx = 0;
+let isDrawing = false, lastX = 0, lastY = 0;
+const synth = window.speechSynthesis;
+let korVoice = null;
+
+function loadVoices() {
+  const v = synth.getVoices();
+  korVoice = v.find(x => x.lang.startsWith('ko')) || null;
+}
+loadVoices();
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+
+function speak(text) {
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR'; u.rate = 0.8; u.pitch = 1;
+  if (korVoice) u.voice = korVoice;
+  synth.speak(u);
+}
+
+function show(el, delay) { setTimeout(() => el.classList.add('show'), delay); }
+
+function resetMain() {
+  const inp = document.getElementById('nameInput');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loader').classList.remove('active');
+  ['translit','divider','roman'].forEach(id => document.getElementById(id).classList.remove('show'));
+  document.getElementById('koreanRow').innerHTML = '';
+  document.getElementById('actionBtns').classList.remove('show');
+  inp.disabled = false; inp.value = ''; inp.focus();
+}
+
+function renderResult(data) {
+  currentChars = data.characters;
+  document.getElementById('results').style.display = 'block';
+  const translit = document.getElementById('translit');
+  translit.textContent = data.transliteration;
+  show(translit, 100);
+  show(document.getElementById('divider'), 420);
+  const row = document.getElementById('koreanRow');
+  data.characters.forEach((ch, i) => {
+    const unit = document.createElement('div');
+    unit.className = 'char-unit';
+    unit.onclick = () => speak(ch.hangul);
+    unit.innerHTML = `
+      <span class="hangul-char" style="color:${OBANGSAEK[i%OBANGSAEK.length]}">${ch.hangul}</span>
+      <span class="sound-hint">tap to hear</span>
+      <div class="hanja-block">
+        <span class="hanja-sm">${ch.hanja}</span>
+        <span class="meaning-sm">${ch.meaning}</span>
+      </div>`;
+    row.appendChild(unit);
+    show(unit, 720 + i * 300);
+  });
+  const roman = document.getElementById('roman');
+  roman.textContent = data.romanization;
+  show(roman, 720 + data.characters.length * 300 + 100);
+  setTimeout(() => document.getElementById('actionBtns').classList.add('show'), 720 + data.characters.length * 300 + 500);
+}
+
+async function handleSubmit() {
+  const inp = document.getElementById('nameInput');
+  const name = inp.value.trim();
+  if (!name) return;
+  inp.disabled = true;
+  document.getElementById('loader').classList.add('active');
+  document.getElementById('results').style.display = 'none';
+  try {
+    const res = await fetch('/.netlify/functions/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+    const parsed = await res.json();
+    document.getElementById('loader').classList.remove('active');
+    renderResult(parsed);
+  } catch (err) {
+    document.getElementById('loader').classList.remove('active');
+    inp.disabled = false;
+    alert('Something went wrong 😢\n' + err.message);
+  }
+}
+
+document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+window.addEventListener('load', () => document.getElementById('nameInput').focus());
+
+// ── PRACTICE ──
+const STROKE_ORDER = {
+  '도': ['ㅗ먼저','ㄷ다음'],
+  '민': ['ㅣ먼저','ㅡ다음','ㅁ마지막'],
+  '혁': ['ㅕ먼저','ㅎ다음','ㄱ마지막'],
+  '김': ['ㅣ먼저','ㄱ다음','ㅁ마지막'],
+  '이': ['ㅣ먼저','ㅇ다음'],
+  '박': ['ㅏ먼저','ㅂ다음','ㄱ마지막'],
+};
+
+function openPractice() {
+  document.getElementById('mainPage').style.display = 'none';
+  document.getElementById('practicePage').style.display = 'block';
+  buildTabs();
+  selectChar(0);
+  setupDrawing();
+}
+
+function closePractice() {
+  document.getElementById('practicePage').style.display = 'none';
+  document.getElementById('mainPage').style.display = 'flex';
+}
+
+function buildTabs() {
+  const tabs = document.getElementById('charTabs');
+  tabs.innerHTML = '';
+  currentChars.forEach((ch, i) => {
+    const t = document.createElement('div');
+    t.className = 'char-tab' + (i===0?' active':'');
+    t.style.color = OBANGSAEK[i%OBANGSAEK.length];
+    t.textContent = ch.hangul;
+    t.onclick = () => selectChar(i);
+    tabs.appendChild(t);
+  });
+}
+
+function selectChar(i) {
+  currentIdx = i;
+  const ch = currentChars[i];
+  const color = OBANGSAEK[i%OBANGSAEK.length];
+  document.querySelectorAll('.char-tab').forEach((t,j) => {
+    t.classList.toggle('active', j===i);
+    t.style.color = j===i ? OBANGSAEK[j%OBANGSAEK.length] : '#aaa';
+  });
+  document.getElementById('practiceCharBig').textContent = ch.hangul;
+  document.getElementById('practiceCharBig').style.color = color;
+  document.getElementById('practiceHanja').textContent = ch.hanja;
+  document.getElementById('practiceMeaning').textContent = ch.meaning;
+  document.getElementById('scoreDisplay').textContent = '';
+  document.getElementById('scoreFill').style.width = '0';
+  document.getElementById('scoreFill').style.background = color;
+  drawGuide(ch.hangul, color);
+  clearDraw();
+  buildStrokeOrder(ch.hangul, color);
+}
+
+function resizeCanvases() {
+  const wrap = document.getElementById('canvasWrap');
+  const size = wrap.offsetWidth;
+  ['guideCanvas','drawCanvas'].forEach(id => {
+    const c = document.getElementById(id);
+    c.width = size; c.height = size;
+  });
+}
+
+function drawGuide(char, color) {
+  resizeCanvases();
+  const canvas = document.getElementById('guideCanvas');
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+  ctx.clearRect(0,0,s,s);
+
+  // 공책 그리드
+  ctx.strokeStyle = 'rgba(150,130,110,0.25)';
+  ctx.lineWidth = 0.5;
+  const cell = Math.floor(s/8);
+  for (let x=0; x<=s; x+=cell) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,s); ctx.stroke(); }
+  for (let y=0; y<=s; y+=cell) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(s,y); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(150,130,110,0.1)';
+  for (let x=cell/2; x<=s; x+=cell) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,s); ctx.stroke(); }
+  for (let y=cell/2; y<=s; y+=cell) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(s,y); ctx.stroke(); }
+
+  // 중앙 십자선
+  ctx.strokeStyle = 'rgba(150,130,110,0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(s/2,0); ctx.lineTo(s/2,s); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,s/2); ctx.lineTo(s,s/2); ctx.stroke();
+
+  // 가이드 글자
+  ctx.fillStyle = color;
+  ctx.font = `900 ${Math.floor(s*0.82)}px 'Noto Sans KR', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(char, s/2, s/2 + s*0.03);
+}
+
+function buildStrokeOrder(char, color) {
+  const container = document.getElementById('strokeSteps');
+  container.innerHTML = '';
+  const strokeData = getStrokeData(char);
+  strokeData.forEach((strokes, i) => {
+    const step = document.createElement('div');
+    step.className = 'stroke-step';
+    const c = document.createElement('canvas');
+    c.className = 'stroke-canvas';
+    c.width = 56; c.height = 56;
+    step.appendChild(c);
+    const num = document.createElement('div');
+    num.className = 'stroke-num';
+    num.textContent = i + 1;
+    step.appendChild(num);
+    container.appendChild(step);
+    drawStrokeStep(c, char, strokes, color, i === strokeData.length - 1);
+  });
+}
+
+function getStrokeData(char) {
+  // 한글 획순 데이터 — 누적 획수로 표현
+  const strokeMap = {
+    '도': [1, 2, 3, 4],
+    '민': [1, 2, 3, 4, 5],
+    '혁': [1, 2, 3, 4, 5, 6],
+    '김': [1, 2, 3, 4, 5],
+    '이': [1, 2, 3],
+    '박': [1, 2, 3, 4, 5, 6],
+    '서': [1, 2, 3, 4],
+    '준': [1, 2, 3, 4, 5],
+    '윤': [1, 2, 3, 4, 5],
+    '지': [1, 2, 3, 4],
+    '현': [1, 2, 3, 4, 5, 6],
+    '안': [1, 2, 3, 4],
+    '나': [1, 2, 3],
+    '예': [1, 2, 3, 4, 5],
+  };
+  const count = strokeMap[char] || [1,2,3,4];
+  return count;
+}
+
+function drawStrokeStep(canvas, char, strokeNum, color, isFinal) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+  ctx.clearRect(0,0,s,s);
+
+  // 전체 글자 연하게
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = color;
+  ctx.font = `900 ${Math.floor(s*0.82)}px 'Noto Sans KR', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(char, s/2, s/2 + s*0.03);
+
+  // 현재까지의 획 강조 (클리핑으로 부분 표시)
+  ctx.globalAlpha = 1;
+  ctx.save();
+  // 획 번호에 따라 글자의 일부를 강조
+  const progress = strokeNum / (getStrokeData(char).length);
+  ctx.globalAlpha = isFinal ? 1 : 0.9;
+  ctx.fillStyle = color;
+
+  // 클리핑 영역 — 글자 진행도에 따라
+  ctx.beginPath();
+  ctx.rect(0, s * (1 - progress) * 0.3, s, s);
+  ctx.clip();
+  ctx.fillText(char, s/2, s/2 + s*0.03);
+  ctx.restore();
+
+  // 획 번호 표시
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = color;
+  ctx.font = `bold ${Math.floor(s*0.22)}px 'Bebas Neue', sans-serif`;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText(strokeNum, s - 3, 2);
+}
+
+async function initGuide() {
+  await document.fonts.load("900 40px 'Noto Sans KR'");
+  if (currentChars.length > 0) selectChar(currentIdx);
+}
+
+function clearDraw() {
+  const c = document.getElementById('drawCanvas');
+  c.getContext('2d').clearRect(0,0,c.width,c.height);
+  document.getElementById('scoreDisplay').textContent = '';
+  document.getElementById('scoreFill').style.width = '0';
+}
+
+function scoreDrawing() {
+  const guide = document.getElementById('guideCanvas');
+  const draw = document.getElementById('drawCanvas');
+  const gs = guide.width;
+  const gctx = guide.getContext('2d');
+  const dctx = draw.getContext('2d');
+
+  const gData = gctx.getImageData(0, 0, gs, gs).data;
+  const dData = dctx.getImageData(0, 0, gs, gs).data;
+
+  // 가이드에서 글자 픽셀 추출 (불투명한 픽셀)
+  let guidePixels = 0, overlap = 0, drawTotal = 0;
+  for (let i = 3; i < gData.length; i += 4) {
+    if (gData[i] > 30) guidePixels++;
+    if (dData[i] > 30) {
+      drawTotal++;
+      if (gData[i] > 30) overlap++;
     }
-    function renderResult(data) {
-      document.getElementById('results').style.display = 'block';
-      currentChars = data.characters;
-      const translit = document.getElementById('translit');
-      translit.textContent = data.transliteration;
-      show(translit, 100);
-      show(document.getElementById('divider'), 420);
-      const row = document.getElementById('koreanRow');
-      data.characters.forEach((ch, i) => {
-        const unit = document.createElement('div');
-        unit.className = 'char-unit';
-        unit.innerHTML = `<span style="color:${OBANGSAEK[i%OBANGSAEK.length]};line-height:1;">${ch.hangul}</span><div class="hanja-block"><span class="hanja-char-sm">${ch.hanja}</span><span class="hanja-meaning-sm">${ch.meaning}</span></div>`;
-        row.appendChild(unit);
-        show(unit, 720 + i * 300);
-      });
-      show(document.getElementById('roman'), 720 + data.characters.length * 300 + 100);
-      document.getElementById('roman').textContent = data.romanization;
-      setTimeout(() => document.getElementById('actionBtns').classList.add('show'), 720 + data.characters.length * 300 + 500);
-    }
-    async function handleSubmit() {
-      const inp = document.getElementById('nameInput');
-      const name = inp.value.trim();
-      if (!name) return;
-      inp.disabled = true;
-      document.getElementById('loader').classList.add('active');
-      document.getElementById('results').style.display = 'none';
-      try {
-        const res = await fetch('/.netlify/functions/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) });
-        if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Something went wrong'); }
-        const parsed = await res.json();
-        document.getElementById('loader').classList.remove('active');
-        renderResult(parsed);
-      } catch (err) {
-        document.getElementById('loader').classList.remove('active');
-        inp.disabled = false;
-        alert('Something went wrong 😢\n' + (err.message || 'Please try again.'));
-      }
-    }
-    function openPractice() {
-      document.getElementById('mainPage').style.display = 'none';
-      document.getElementById('practicePage').style.display = 'block';
-      const tabs = document.getElementById('charTabs');
-      tabs.innerHTML = '';
-      currentChars.forEach((ch, i) => {
-        const tab = document.createElement('div');
-        tab.className = 'char-tab' + (i === 0 ? ' active' : '');
-        tab.textContent = ch.hangul;
-        tab.onclick = () => selectChar(i);
-        tabs.appendChild(tab);
-      });
-      selectChar(0);
-    }
-    function closePractice() {
-      document.getElementById('practicePage').style.display = 'none';
-      document.getElementById('mainPage').style.display = 'flex';
-    }
-    function selectChar(i) {
-      const ch = currentChars[i];
-      document.querySelectorAll('.char-tab').forEach((t, j) => { t.classList.toggle('active', j === i); t.style.color = j === i ? OBANGSAEK[i%OBANGSAEK.length] : ''; });
-      document.getElementById('practiceCharDisplay').textContent = ch.hangul;
-      document.getElementById('practiceCharDisplay').style.color = OBANGSAEK[i%OBANGSAEK.length];
-      document.getElementById('practiceHanja').textContent = ch.hanja;
-      document.getElementById('practiceMeaning').textContent = ch.meaning;
-      const gc = document.getElementById('guideCanvas');
-      const gctx = gc.getContext('2d');
-      const s = gc.width;
-      gctx.clearRect(0,0,s,s);
-      gctx.strokeStyle='#e0e0e0'; gctx.lineWidth=0.5;
-      gctx.beginPath(); gctx.moveTo(s/2,0); gctx.lineTo(s/2,s); gctx.moveTo(0,s/2); gctx.lineTo(s,s/2); gctx.stroke();
-      gctx.fillStyle = OBANGSAEK[i%OBANGSAEK.length];
-      gctx.font = `${s*0.75}px 'Noto Serif KR', serif`;
-      gctx.textAlign='center'; gctx.textBaseline='middle';
-      gctx.fillText(ch.hangul, s/2, s/2 + s*0.04);
-      clearCanvas();
-    }
-    function clearCanvas() { const c = document.getElementById('drawCanvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); }
-    function getPos(e, canvas) {
-      const rect = canvas.getBoundingClientRect();
-      const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
-      if (e.touches) return { x:(e.touches[0].clientX-rect.left)*sx, y:(e.touches[0].clientY-rect.top)*sy };
-      return { x:(e.clientX-rect.left)*sx, y:(e.clientY-rect.top)*sy };
-    }
-    function setupDrawing() {
-      const canvas = document.getElementById('drawCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.strokeStyle='#0a0a0a'; ctx.lineWidth=6; ctx.lineCap='round'; ctx.lineJoin='round';
-      function start(e) { e.preventDefault(); isDrawing=true; const p=getPos(e,canvas); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(lastX,lastY,3,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill(); }
-      function draw(e) { e.preventDefault(); if(!isDrawing) return; const p=getPos(e,canvas); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; }
-      function stop(e) { e.preventDefault(); isDrawing=false; }
-      canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',draw); canvas.addEventListener('mouseup',stop); canvas.addEventListener('mouseleave',stop);
-      canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',draw,{passive:false}); canvas.addEventListener('touchend',stop,{passive:false});
-    }
-    document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') handleSubmit(); });
-    window.addEventListener('load', () => { document.getElementById('nameInput').focus(); setupDrawing(); });
-  </script>
+  }
+
+  if (drawTotal === 0) {
+    document.getElementById('scoreDisplay').textContent = 'Draw something first!';
+    return;
+  }
+
+  // 점수: 겹침 비율 + 정확도
+  const coverage = guidePixels > 0 ? Math.min(overlap / guidePixels, 1) : 0;
+  const precision = drawTotal > 0 ? Math.min(overlap / drawTotal, 1) : 0;
+  const rawScore = (coverage * 0.6 + precision * 0.4) * 100;
+  const score = Math.round(Math.min(rawScore * 1.4, 100));
+
+  const color = OBANGSAEK[currentIdx % OBANGSAEK.length];
+  const fill = document.getElementById('scoreFill');
+  fill.style.background = color;
+  fill.style.width = score + '%';
+
+  let msg = '';
+  if (score >= 85) msg = `${score} — 완벽해요! Perfect!`;
+  else if (score >= 65) msg = `${score} — 잘했어요! Good job!`;
+  else if (score >= 40) msg = `${score} — 다시 해봐요! Try again!`;
+  else msg = `${score} — 연습이 필요해요! Keep practicing!`;
+
+  document.getElementById('scoreDisplay').textContent = msg;
+}
+
+// ── DRAWING ──
+function getPos(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
+  if (e.touches) return { x:(e.touches[0].clientX-rect.left)*sx, y:(e.touches[0].clientY-rect.top)*sy };
+  return { x:(e.clientX-rect.left)*sx, y:(e.clientY-rect.top)*sy };
+}
+
+function setupDrawing() {
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#0a0a0a';
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  function start(e) {
+    e.preventDefault(); isDrawing = true;
+    const p = getPos(e, canvas);
+    lastX = p.x; lastY = p.y;
+    ctx.beginPath(); ctx.arc(lastX,lastY,4,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill();
+  }
+  function draw(e) {
+    e.preventDefault(); if (!isDrawing) return;
+    const p = getPos(e, canvas);
+    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke();
+    lastX=p.x; lastY=p.y;
+  }
+  function stop(e) { e.preventDefault(); isDrawing=false; }
+
+  canvas.removeEventListener('mousedown', canvas._start);
+  canvas._start = start;
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stop);
+  canvas.addEventListener('mouseleave', stop);
+  canvas.addEventListener('touchstart', start, {passive:false});
+  canvas.addEventListener('touchmove', draw, {passive:false});
+  canvas.addEventListener('touchend', stop, {passive:false});
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('practicePage').style.display !== 'none') {
+    if (currentChars.length > 0) selectChar(currentIdx);
+  }
+});
+</script>
 </body>
 </html>
