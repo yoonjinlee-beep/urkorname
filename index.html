@@ -500,503 +500,246 @@ function setupDrawing() {
 
 window.addEventListener('resize', () => { if(document.getElementById('practicePage').style.display!=='none') selectChar(currentIdx); });
 
-// ── 단청 배경 애니메이션 ──
-(function() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  const C = { 
-    pink:   '#FF4FA3',
-    mint:   '#2ECFB0',
-    coral:  '#FF6B4A',
-    lavender:'#9B6FE8',
-    gold:   '#FFB830',
-    sky:    '#4FC3F7',
-    green:  '#3DD68C',
-    red:    '#FF3355',
-  };
-  const ALL = Object.values(C);
 
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+// ── 단청 배경 애니메이션 ──
+try {
+(function() {
+  var bgCanvas = document.getElementById('bg-canvas');
+  if (!bgCanvas) return;
+  var bgCtx = bgCanvas.getContext('2d');
+
+  var COLS = ['#FF4FA3','#2ECFB0','#FF6B4A','#9B6FE8','#FFB830','#4FC3F7','#3DD68C','#FF3355'];
+
+  function resize() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+  }
   resize();
   window.addEventListener('resize', resize);
 
-  // 단청 구름무늬 (운문) — 전통 소용돌이 구름
-  function drawUnmun(ctx, x, y, size, color, t) {
-    ctx.save();
-    ctx.globalAlpha = 0.18;
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-
-    // 구름 몸통 — 겹쳐진 원호들
-    const s = size;
-    const wobble = Math.sin(t * 0.5) * 2;
-
-    // 바깥 구름 테두리
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(x + wobble, y, s * 0.5, Math.PI, 0);
-    ctx.arc(x + s * 0.35 + wobble, y - s * 0.15, s * 0.22, Math.PI * 1.1, -0.1);
-    ctx.arc(x - s * 0.35 + wobble, y - s * 0.15, s * 0.22, Math.PI * 1.9, 0.1);
-    ctx.stroke();
-
-    // 안쪽 소용돌이 (나선)
-    ctx.globalAlpha = 0.08;
-    ctx.lineWidth = 1;
-    for (let side of [-1, 1]) {
-      ctx.beginPath();
-      for (let i = 0; i < 40; i++) {
-        const a = i * 0.28;
-        const r = s * 0.08 + i * s * 0.006;
-        const px = x + side * s * 0.28 + Math.cos(a) * r + wobble;
-        const py = y - s * 0.1 + Math.sin(a) * r;
-        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  // 단청 운문 (구름 소용돌이)
+  function drawUnmun(x, y, r, col, t) {
+    bgCtx.save();
+    bgCtx.globalAlpha = 0.13;
+    bgCtx.strokeStyle = col;
+    bgCtx.lineWidth = 1.5;
+    var w = Math.sin(t * 0.5) * 2;
+    // 구름 외곽
+    bgCtx.beginPath();
+    bgCtx.arc(x + w, y, r * 0.5, Math.PI, 0);
+    bgCtx.stroke();
+    bgCtx.beginPath();
+    bgCtx.arc(x + r * 0.3 + w, y - r * 0.12, r * 0.22, Math.PI, 0);
+    bgCtx.stroke();
+    bgCtx.beginPath();
+    bgCtx.arc(x - r * 0.3 + w, y - r * 0.12, r * 0.22, Math.PI, 0);
+    bgCtx.stroke();
+    // 소용돌이
+    bgCtx.globalAlpha = 0.09;
+    bgCtx.lineWidth = 1;
+    for (var s = -1; s <= 1; s += 2) {
+      bgCtx.beginPath();
+      for (var i = 0; i < 35; i++) {
+        var a = i * 0.25;
+        var rad = r * 0.06 + i * r * 0.007;
+        var px = x + s * r * 0.25 + Math.cos(a) * rad + w;
+        var py = y - r * 0.08 + Math.sin(a) * rad;
+        if (i === 0) bgCtx.moveTo(px, py);
+        else bgCtx.lineTo(px, py);
       }
-      ctx.stroke();
+      bgCtx.stroke();
     }
-
-    // 속 채우기 (연하게)
-    ctx.globalAlpha = 0.04;
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.ellipse(x + wobble, y - s * 0.05, s * 0.48, s * 0.28, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    bgCtx.restore();
   }
 
-  // 단청 꽃무늬 (연화문) — 연꽃
-  function drawYeonhwa(ctx, x, y, size, color, t) {
-    ctx.save();
-    ctx.globalAlpha = 0.16;
-    ctx.strokeStyle = color;
-    const s = size;
-    const rot = t * 0.008;
-
-    ctx.lineWidth = 1;
-    // 꽃잎 8개
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + rot;
-      const px = x + Math.cos(a) * s * 0.38;
-      const py = y + Math.sin(a) * s * 0.38;
-      ctx.beginPath();
-      ctx.ellipse(
-        x + Math.cos(a) * s * 0.22,
-        y + Math.sin(a) * s * 0.22,
-        s * 0.18, s * 0.1,
-        a, 0, Math.PI * 2
+  // 연화문 (연꽃)
+  function drawYeonhwa(x, y, r, col, t) {
+    bgCtx.save();
+    bgCtx.globalAlpha = 0.12;
+    bgCtx.strokeStyle = col;
+    bgCtx.lineWidth = 1.2;
+    var rot = t * 0.006;
+    for (var i = 0; i < 8; i++) {
+      var a = (i / 8) * Math.PI * 2 + rot;
+      bgCtx.beginPath();
+      bgCtx.ellipse(
+        x + Math.cos(a) * r * 0.22,
+        y + Math.sin(a) * r * 0.22,
+        r * 0.18, r * 0.1, a, 0, Math.PI * 2
       );
-      ctx.stroke();
+      bgCtx.stroke();
     }
-    // 바깥 원
-    ctx.beginPath(); ctx.arc(x, y, s * 0.5, 0, Math.PI * 2); ctx.stroke();
-    // 중심 원
-    ctx.globalAlpha = 0.07;
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.arc(x, y, s * 0.12, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    bgCtx.beginPath();
+    bgCtx.arc(x, y, r * 0.5, 0, Math.PI * 2);
+    bgCtx.stroke();
+    bgCtx.globalAlpha = 0.08;
+    bgCtx.fillStyle = col;
+    bgCtx.beginPath();
+    bgCtx.arc(x, y, r * 0.1, 0, Math.PI * 2);
+    bgCtx.fill();
+    bgCtx.restore();
   }
 
-  // 단청 뇌문 (번개/격자 무늬)
-  function drawNoemun(ctx, x, y, size, color) {
-    ctx.save();
-    ctx.globalAlpha = 0.07;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.2;
-    const s = size * 0.4;
-
-    // ㄱ자 반복 패턴
-    const steps = [
-      [0,0,s,0], [s,0,s,-s], [s,-s,2*s,-s], [2*s,-s,2*s,0],
-      [2*s,0,3*s,0], [3*s,0,3*s,s], [3*s,s,2*s,s], [2*s,s,2*s,2*s],
-    ];
-    ctx.beginPath();
-    steps.forEach(([x1,y1,x2,y2]) => {
-      ctx.moveTo(x - s*1.5 + x1, y - s*0.5 + y1);
-      ctx.lineTo(x - s*1.5 + x2, y - s*0.5 + y2);
-    });
-    ctx.stroke();
-    ctx.restore();
+  // 뇌문 (번개격자)
+  function drawNoemun(x, y, r, col) {
+    bgCtx.save();
+    bgCtx.globalAlpha = 0.1;
+    bgCtx.strokeStyle = col;
+    bgCtx.lineWidth = 1.2;
+    var s = r * 0.35;
+    bgCtx.beginPath();
+    bgCtx.moveTo(x - s*1.5, y - s*0.5);
+    bgCtx.lineTo(x - s*0.5, y - s*0.5);
+    bgCtx.lineTo(x - s*0.5, y - s*1.5);
+    bgCtx.lineTo(x + s*0.5, y - s*1.5);
+    bgCtx.lineTo(x + s*0.5, y - s*0.5);
+    bgCtx.lineTo(x + s*1.5, y - s*0.5);
+    bgCtx.lineTo(x + s*1.5, y + s*0.5);
+    bgCtx.lineTo(x + s*0.5, y + s*0.5);
+    bgCtx.lineTo(x + s*0.5, y + s*1.5);
+    bgCtx.lineTo(x - s*0.5, y + s*1.5);
+    bgCtx.lineTo(x - s*0.5, y + s*0.5);
+    bgCtx.lineTo(x - s*1.5, y + s*0.5);
+    bgCtx.closePath();
+    bgCtx.stroke();
+    bgCtx.restore();
   }
 
-  // 단청 만자문 (卍)
-  function drawManja(ctx, x, y, size, color, rot) {
-    ctx.save();
-    ctx.globalAlpha = 0.07;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    const s = size * 0.35;
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-
-    ctx.beginPath();
-    // 卍 모양
-    ctx.moveTo(0, -s*1.5); ctx.lineTo(0, s*1.5);
-    ctx.moveTo(-s*1.5, 0); ctx.lineTo(s*1.5, 0);
-    // 네 끝 꺾임
-    ctx.moveTo(0, -s*1.5); ctx.lineTo(s*0.8, -s*1.5);
-    ctx.moveTo(s*1.5, 0); ctx.lineTo(s*1.5, -s*0.8);
-    ctx.moveTo(0, s*1.5); ctx.lineTo(-s*0.8, s*1.5);
-    ctx.moveTo(-s*1.5, 0); ctx.lineTo(-s*1.5, s*0.8);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // 연(전통 방패연)
+  // 연 (방패연)
   function drawKite(k, t) {
-    const bob = Math.sin(t * 0.5 + k.phase) * 6;
-    const sway = Math.sin(t * 0.35 + k.phase) * 0.1;
-    ctx.save();
-    ctx.translate(k.x, k.y + bob);
-    ctx.rotate(sway - 0.2);
-
-    const w = k.size, h = k.size * 1.4;
-
-    // 방패연 — 4등분 마름모 (destination-out 없이)
-    ctx.globalAlpha = 0.55;
-    // 위 삼각
-    ctx.fillStyle = k.c1;
-    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(w,0); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-    // 오른 삼각
-    ctx.fillStyle = k.c2;
-    ctx.beginPath(); ctx.moveTo(w,0); ctx.lineTo(0,h); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-    // 아래 삼각
-    ctx.fillStyle = k.c1;
-    ctx.beginPath(); ctx.moveTo(0,h); ctx.lineTo(-w,0); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-    // 왼 삼각
-    ctx.fillStyle = k.c2;
-    ctx.beginPath(); ctx.moveTo(-w,0); ctx.lineTo(0,-h); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-
-    // 테두리 + 중심선
-    ctx.globalAlpha = 0.7;
-    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(w,0); ctx.lineTo(0,h); ctx.lineTo(-w,0); ctx.closePath(); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(0,h); ctx.moveTo(-w,0); ctx.lineTo(w,0); ctx.stroke();
-
-    // 가운데 원 장식
-    ctx.globalAlpha = 0.4;
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(0, 0, w * 0.45, 0, Math.PI * 2); ctx.stroke();
-
-    ctx.restore();
-
+    var bob = Math.sin(t * 0.5 + k.phase) * 5;
+    var sway = Math.sin(t * 0.35 + k.phase) * 0.1;
+    bgCtx.save();
+    bgCtx.translate(k.x, k.y + bob);
+    bgCtx.rotate(sway - 0.2);
+    var w = k.size, h = k.size * 1.4;
+    bgCtx.globalAlpha = 0.55;
+    // 4분할 마름모
+    bgCtx.fillStyle = k.c1;
+    bgCtx.beginPath(); bgCtx.moveTo(0,-h); bgCtx.lineTo(w,0); bgCtx.lineTo(0,0); bgCtx.closePath(); bgCtx.fill();
+    bgCtx.fillStyle = k.c2;
+    bgCtx.beginPath(); bgCtx.moveTo(w,0); bgCtx.lineTo(0,h); bgCtx.lineTo(0,0); bgCtx.closePath(); bgCtx.fill();
+    bgCtx.fillStyle = k.c1;
+    bgCtx.beginPath(); bgCtx.moveTo(0,h); bgCtx.lineTo(-w,0); bgCtx.lineTo(0,0); bgCtx.closePath(); bgCtx.fill();
+    bgCtx.fillStyle = k.c2;
+    bgCtx.beginPath(); bgCtx.moveTo(-w,0); bgCtx.lineTo(0,-h); bgCtx.lineTo(0,0); bgCtx.closePath(); bgCtx.fill();
+    bgCtx.globalAlpha = 0.6;
+    bgCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+    bgCtx.lineWidth = 1;
+    bgCtx.beginPath(); bgCtx.moveTo(0,-h); bgCtx.lineTo(w,0); bgCtx.lineTo(0,h); bgCtx.lineTo(-w,0); bgCtx.closePath(); bgCtx.stroke();
+    bgCtx.beginPath(); bgCtx.moveTo(0,-h); bgCtx.lineTo(0,h); bgCtx.moveTo(-w,0); bgCtx.lineTo(w,0); bgCtx.stroke();
+    bgCtx.globalAlpha = 0.35;
+    bgCtx.beginPath(); bgCtx.arc(0,0,w*0.42,0,Math.PI*2); bgCtx.stroke();
+    bgCtx.restore();
     // 연실
-    ctx.save();
-    ctx.globalAlpha = 0.2;
-    ctx.strokeStyle = '#aaa';
-    ctx.lineWidth = 0.8;
-    const tailY = k.y + bob + h;
-    ctx.beginPath();
-    ctx.moveTo(k.x, tailY);
-    const cx1 = k.x + Math.sin(t*0.3+k.phase)*18, cy1 = tailY + k.tailLen*0.4;
-    const cx2 = k.x + Math.sin(t*0.5+k.phase)*28, cy2 = tailY + k.tailLen*0.75;
-    const ex  = k.x + Math.sin(t*0.6+k.phase)*36, ey  = tailY + k.tailLen;
-    ctx.bezierCurveTo(cx1,cy1,cx2,cy2,ex,ey);
-    ctx.stroke();
-    // 꼬리 리본
-    for (let i=0;i<5;i++) {
-      const ry = tailY + k.tailLen*(0.2+i*0.16);
-      const rx = k.x + Math.sin(t*0.5+k.phase+i)*12*(i/4);
-      ctx.globalAlpha = 0.35;
-      ctx.strokeStyle = i%2===0 ? k.c1 : k.c2;
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.ellipse(rx, ry, 6, 4, Math.sin(t+i)*0.5, 0, Math.PI*2); ctx.stroke();
-    }
-    ctx.restore();
+    bgCtx.save();
+    bgCtx.globalAlpha = 0.2;
+    bgCtx.strokeStyle = '#bbb';
+    bgCtx.lineWidth = 0.8;
+    bgCtx.beginPath();
+    var ty = k.y + bob + h;
+    bgCtx.moveTo(k.x, ty);
+    bgCtx.bezierCurveTo(
+      k.x + Math.sin(t*0.3+k.phase)*16, ty + k.tail*0.4,
+      k.x + Math.sin(t*0.5+k.phase)*24, ty + k.tail*0.75,
+      k.x + Math.sin(t*0.6+k.phase)*32, ty + k.tail
+    );
+    bgCtx.stroke();
+    bgCtx.restore();
   }
 
-  // 파도 (수파문)
+  // 파도
   function drawWaves(t) {
-    const W = canvas.width, H = canvas.height;
-    [
-      [H * 0.87, 6, 0.007, 0.3, C.sky,   0.10],
-      [H * 0.90, 4, 0.011, 0.5, C.mint,  0.09],
-      [H * 0.93, 5, 0.009, 0.25, C.pink, 0.08],
-    ].forEach(([wy, amp, freq, spd, col, a]) => {
-      ctx.save();
-      ctx.globalAlpha = a;
-      ctx.strokeStyle = col;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      for (let x = 0; x <= W; x += 2) {
-        const y = wy + Math.sin(x * freq + t * spd) * amp;
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    var W = bgCanvas.width, H = bgCanvas.height;
+    var waves = [
+      [H*0.87, 6, 0.007, 0.3,  '#4FC3F7', 0.09],
+      [H*0.90, 4, 0.011, 0.5,  '#2ECFB0', 0.08],
+      [H*0.93, 5, 0.009, 0.25, '#FF4FA3', 0.07],
+    ];
+    for (var wi = 0; wi < waves.length; wi++) {
+      var wv = waves[wi];
+      bgCtx.save();
+      bgCtx.globalAlpha = wv[5];
+      bgCtx.strokeStyle = wv[4];
+      bgCtx.lineWidth = 1.5;
+      bgCtx.beginPath();
+      for (var x = 0; x <= W; x += 3) {
+        var y = wv[0] + Math.sin(x * wv[2] + t * wv[3]) * wv[1];
+        if (x === 0) bgCtx.moveTo(x, y);
+        else bgCtx.lineTo(x, y);
       }
-      ctx.stroke();
-      ctx.restore();
-    });
+      bgCtx.stroke();
+      bgCtx.restore();
+    }
   }
 
-  // 무늬 객체들 초기화
-  let motifs = [];
+  // 무늬 초기화
+  var motifs = [];
   function initMotifs() {
     motifs = [];
-    const W = canvas.width, H = canvas.height;
-    const types = ['unmun','yeonhwa','noemun','manja'];
-    for (let i = 0; i < 28; i++) {
+    var W = bgCanvas.width, H = bgCanvas.height;
+    var types = ['unmun','yeonhwa','noemun','unmun','yeonhwa'];
+    for (var i = 0; i < 24; i++) {
       motifs.push({
         x: Math.random() * W,
         y: Math.random() * H,
-        size: 24 + Math.random() * 36,
-        color: ALL[Math.floor(Math.random() * ALL.length)],
+        size: 22 + Math.random() * 34,
+        col: COLS[Math.floor(Math.random() * COLS.length)],
         type: types[Math.floor(Math.random() * types.length)],
-        vy: -0.12 - Math.random() * 0.18,
-        vx: (Math.random() - 0.5) * 0.08,
+        vy: -0.1 - Math.random() * 0.15,
+        vx: (Math.random() - 0.5) * 0.06,
         rot: Math.random() * Math.PI * 2,
         phase: Math.random() * Math.PI * 2,
       });
     }
   }
   initMotifs();
-  window.addEventListener('resize', () => { resize(); initMotifs(); });
+  window.addEventListener('resize', function() { resize(); initMotifs(); });
 
-  // 연 초기화
-  const kites = [
-    { x: 180,  y: 120, vx: 0.35, size: 20, c1: C.pink,   c2: C.sky,    phase: 0,   tailLen: 110 },
-    { x: 650,  y: 90,  vx: 0.28, size: 16, c1: C.sky,    c2: C.gold,   phase: 2.0, tailLen: 90  },
-    { x: 1050, y: 160, vx: 0.42, size: 22, c1: C.gold,   c2: C.mint,   phase: 4.0, tailLen: 120 },
+  var kites = [
+    { x: 160,  y: 110, vx: 0.32, size: 18, c1:'#FF4FA3', c2:'#4FC3F7', phase: 0,   tail: 100 },
+    { x: 600,  y: 80,  vx: 0.26, size: 15, c1:'#4FC3F7', c2:'#FFB830', phase: 2.1, tail: 85  },
+    { x: 1000, y: 140, vx: 0.38, size: 20, c1:'#FFB830', c2:'#2ECFB0', phase: 4.2, tail: 110 },
   ];
 
-  let t = 0;
-  function animate() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
+  var bgT = 0;
+  function bgAnimate() {
+    var W = bgCanvas.width, H = bgCanvas.height;
+    bgCtx.clearRect(0, 0, W, H);
 
-    // 단청 무늬
-    motifs.forEach(m => {
+    for (var i = 0; i < motifs.length; i++) {
+      var m = motifs[i];
       m.x += m.vx;
       m.y += m.vy;
       m.rot += 0.003;
       if (m.y < -m.size * 2) { m.y = H + m.size; m.x = Math.random() * W; }
       if (m.x < -60) m.x = W + 60;
       if (m.x > W + 60) m.x = -60;
+      bgCtx.save();
+      bgCtx.translate(m.x, m.y);
+      bgCtx.rotate(m.rot);
+      bgCtx.translate(-m.x, -m.y);
+      if (m.type === 'unmun') drawUnmun(m.x, m.y, m.size, m.col, bgT + m.phase);
+      else if (m.type === 'yeonhwa') drawYeonhwa(m.x, m.y, m.size, m.col, bgT);
+      else drawNoemun(m.x, m.y, m.size, m.col);
+      bgCtx.restore();
+    }
 
-      ctx.save();
-      ctx.translate(m.x, m.y);
-      ctx.rotate(m.rot);
-      ctx.translate(-m.x, -m.y);
-
-      if (m.type === 'unmun')   drawUnmun(ctx, m.x, m.y, m.size, m.color, t + m.phase);
-      else if (m.type === 'yeonhwa') drawYeonhwa(ctx, m.x, m.y, m.size, m.color, t);
-      else if (m.type === 'noemun')  drawNoemun(ctx, m.x, m.y, m.size, m.color);
-      else                           drawManja(ctx, m.x, m.y, m.size, m.color, m.rot);
-
-      ctx.restore();
-    });
-
-    // 연
-    kites.forEach(k => {
+    for (var j = 0; j < kites.length; j++) {
+      var k = kites[j];
       k.x += k.vx;
-      if (k.x > W + 80) { k.x = -60; k.y = 60 + Math.random() * H * 0.3; }
-      drawKite(k, t);
-    });
+      if (k.x > W + 80) { k.x = -60; k.y = 50 + Math.random() * H * 0.3; }
+      drawKite(k, bgT);
+    }
 
-    drawWaves(t);
-    t += 0.016;
-    requestAnimationFrame(animate);
+    drawWaves(bgT);
+    bgT += 0.016;
+    requestAnimationFrame(bgAnimate);
   }
-  animate();
+  bgAnimate();
 })();
+} catch(e) { console.warn('BG error:', e); }
 
-  const C = { blue:'#1A4A8A', red:'#C84B31', yellow:'#C8960C', green:'#2E7D32', pink:'#d4607a', teal:'#1a7a6a', purple:'#6a3a9a' };
-  const ALL = Object.values(C);
-
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // ── 패턴 타일 (민화 모티프) ──
-  function drawPatternTile(ctx, x, y, size, color, type, alpha) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = 1.2;
-    const h = size/2;
-
-    if (type === 0) {
-      // 마름모 + 내부 십자
-      ctx.beginPath(); ctx.moveTo(x,y-h); ctx.lineTo(x+h,y); ctx.lineTo(x,y+h); ctx.lineTo(x-h,y); ctx.closePath(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x,y-h*0.5); ctx.lineTo(x,y+h*0.5); ctx.moveTo(x-h*0.5,y); ctx.lineTo(x+h*0.5,y); ctx.stroke();
-    } else if (type === 1) {
-      // 꽃 모양 (6각)
-      for (let i=0;i<6;i++) {
-        const a = (i/6)*Math.PI*2;
-        const bx = x+Math.cos(a)*h*0.5, by = y+Math.sin(a)*h*0.5;
-        ctx.beginPath(); ctx.arc(bx, by, h*0.28, 0, Math.PI*2); ctx.stroke();
-      }
-      ctx.beginPath(); ctx.arc(x, y, h*0.2, 0, Math.PI*2); ctx.fill();
-    } else if (type === 2) {
-      // 빗금 격자
-      for (let i=-1;i<=1;i++) {
-        ctx.beginPath(); ctx.moveTo(x-h, y+i*h*0.6); ctx.lineTo(x+h, y+i*h*0.6); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x+i*h*0.6, y-h); ctx.lineTo(x+i*h*0.6, y+h); ctx.stroke();
-      }
-    } else if (type === 3) {
-      // 소용돌이 (단청 구름)
-      ctx.beginPath();
-      for (let i=0;i<60;i++) {
-        const a = i*0.22, r = h*0.1+i*h*0.012;
-        const px = x+Math.cos(a)*r, py = y+Math.sin(a)*r;
-        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
-      }
-      ctx.stroke();
-    } else if (type === 4) {
-      // 삼각 패턴
-      ctx.beginPath(); ctx.moveTo(x-h,y+h); ctx.lineTo(x,y-h); ctx.lineTo(x+h,y+h); ctx.closePath(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x-h*0.5,y); ctx.lineTo(x+h*0.5,y); ctx.stroke();
-    } else if (type === 5) {
-      // 동그라미 겹치기
-      ctx.beginPath(); ctx.arc(x,y,h*0.7,0,Math.PI*2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(x,y,h*0.4,0,Math.PI*2); ctx.fill();
-    } else if (type === 6) {
-      // 물결 (파도)
-      ctx.beginPath();
-      for (let i=0;i<=20;i++) {
-        const px = x-h+i*h*0.1;
-        const py = y+Math.sin(i*0.6)*h*0.4;
-        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
-      }
-      ctx.stroke();
-    } else {
-      // 별 모양
-      for (let i=0;i<8;i++) {
-        const a = (i/8)*Math.PI*2;
-        const r = i%2===0 ? h*0.8 : h*0.35;
-        const px = x+Math.cos(a)*r, py = y+Math.sin(a)*r;
-        i===0 ? ctx.beginPath() && ctx.moveTo(px,py) : ctx.lineTo(px,py);
-        if (i===0) { ctx.beginPath(); ctx.moveTo(px,py); }
-        else ctx.lineTo(px,py);
-      }
-      ctx.closePath(); ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  // 패턴 타일 배치
-  const tiles = [];
-  function initTiles() {
-    tiles.length = 0;
-    const W = canvas.width, H = canvas.height;
-    const count = Math.floor(W*H/18000);
-    for (let i=0;i<count;i++) {
-      tiles.push({
-        x: Math.random()*W,
-        y: Math.random()*H,
-        size: 18+Math.random()*32,
-        color: ALL[Math.floor(Math.random()*ALL.length)],
-        type: Math.floor(Math.random()*8),
-        alpha: 0.04+Math.random()*0.07,
-        vx: (Math.random()-0.5)*0.3,
-        vy: -0.05-Math.random()*0.2,
-        rot: Math.random()*Math.PI*2,
-        rotV: (Math.random()-0.5)*0.005,
-      });
-    }
-  }
-  initTiles();
-  window.addEventListener('resize', initTiles);
-
-  // 연(kite)
-  const kites = Array.from({length:3}, (_, i) => ({
-    x: (i+0.5) * (window.innerWidth/3),
-    y: 80+Math.random()*200,
-    vx: 0.3+Math.random()*0.3,
-    vy: -0.05-Math.random()*0.1,
-    size: 22+Math.random()*14,
-    c1: ALL[i*2%ALL.length],
-    c2: ALL[(i*2+1)%ALL.length],
-    phase: i*2.1,
-    tailLen: 90+Math.random()*60,
-  }));
-
-  function drawKite(k, t) {
-    const bob = Math.sin(t*0.6+k.phase)*5;
-    const sway = Math.sin(t*0.4+k.phase)*0.12;
-    const x=k.x, y=k.y+bob, s=k.size;
-    ctx.save();
-    ctx.translate(x,y); ctx.rotate(sway-0.25);
-    ctx.globalAlpha=0.55;
-
-    // 4등분 마름모
-    [[0,-s,s,0,k.c1],[s,0,0,s*0.7,k.c2],[0,s*0.7,-s,0,k.c1],[-s,0,0,-s,k.c2]].forEach(([x1,y1,x2,y2,c])=>{
-      ctx.fillStyle=c; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(x1,y1); ctx.lineTo(x2,y2); ctx.closePath(); ctx.fill();
-    });
-    // 테두리 + 중심선
-    ctx.globalAlpha=0.5; ctx.strokeStyle='#fff'; ctx.lineWidth=0.8;
-    ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(s,0); ctx.lineTo(0,s*0.7); ctx.lineTo(-s,0); ctx.closePath(); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(0,s*0.7); ctx.moveTo(-s,0); ctx.lineTo(s,0); ctx.stroke();
-    ctx.restore();
-
-    // 연실
-    ctx.save(); ctx.globalAlpha=0.2; ctx.strokeStyle='#aaa'; ctx.lineWidth=0.7;
-    ctx.beginPath(); ctx.moveTo(x,y+s*0.7);
-    const cx1=x+Math.sin(t*0.3+k.phase)*18, cy1=y+k.tailLen*0.4;
-    const cx2=x+Math.sin(t*0.4+k.phase)*28, cy2=y+k.tailLen*0.75;
-    const ex=x+Math.sin(t*0.5+k.phase)*36, ey=y+k.tailLen;
-    ctx.bezierCurveTo(cx1,cy1,cx2,cy2,ex,ey); ctx.stroke();
-    // 꼬리 리본
-    for (let i=0;i<4;i++) {
-      const ri=i/3;
-      const rx=x+(cx1*ri+ex*(1-ri)*0.3)+Math.sin(t*0.7+i)*6;
-      const ry=y+k.tailLen*(0.25+i*0.2);
-      ctx.globalAlpha=0.4; ctx.fillStyle=i%2===0?k.c1:k.c2;
-      ctx.beginPath(); ctx.ellipse(rx,ry,5,3,Math.sin(t+i)*0.6,0,Math.PI*2); ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  // 파도
-  function drawWaves(t) {
-    const W=canvas.width, H=canvas.height;
-    [[H*0.88,7,0.007,0.35,C.blue,0.06],[H*0.91,5,0.011,0.55,C.yellow,0.05],[H*0.94,4,0.009,0.28,C.teal,0.05]].forEach(([wy,amp,freq,spd,col,a])=>{
-      ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle=col; ctx.lineWidth=1.5;
-      ctx.beginPath();
-      for (let x=0;x<=W;x+=2) {
-        const y=wy+Math.sin(x*freq+t*spd)*amp;
-        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      }
-      ctx.stroke(); ctx.restore();
-    });
-  }
-
-  let t=0;
-  function animate() {
-    const W=canvas.width, H=canvas.height;
-    ctx.clearRect(0,0,W,H);
-
-    // 패턴 타일
-    tiles.forEach(tile => {
-      tile.x += tile.vx;
-      tile.y += tile.vy;
-      tile.rot += tile.rotV;
-      if (tile.y < -tile.size*2) { tile.y=H+tile.size; tile.x=Math.random()*W; }
-      if (tile.x < -tile.size*2) tile.x=W+tile.size;
-      if (tile.x > W+tile.size*2) tile.x=-tile.size;
-
-      ctx.save();
-      ctx.translate(tile.x, tile.y);
-      ctx.rotate(tile.rot);
-      ctx.translate(-tile.x, -tile.y);
-      drawPatternTile(ctx, tile.x, tile.y, tile.size, tile.color, tile.type, tile.alpha);
-      ctx.restore();
-    });
-
-    // 연
-    kites.forEach(k => {
-      k.x += k.vx;
-      k.y += k.vy * Math.sin(t*0.02+k.phase)*0.3;
-      if (k.x > W+100) { k.x=-80; k.y=60+Math.random()*H*0.35; }
-      drawKite(k, t);
-    });
-
-    drawWaves(t);
-    t += 0.018;
-    requestAnimationFrame(animate);
-  }
-  animate();
-})();
 
 
 </script>
