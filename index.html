@@ -422,22 +422,59 @@ function clearDraw() {
 function scoreDrawing() {
   const g = document.getElementById('guideCanvas');
   const d = document.getElementById('drawCanvas');
-  const gd = g.getContext('2d').getImageData(0,0,g.width,g.height).data;
-  const dd = d.getContext('2d').getImageData(0,0,d.width,d.height).data;
-  let guideP=0, overlap=0, drawP=0;
-  for (let i=3;i<gd.length;i+=4) {
-    if(gd[i]>30) guideP++;
-    if(dd[i]>30){ drawP++; if(gd[i]>30) overlap++; }
+  const s = g.width;
+  const gd = g.getContext('2d').getImageData(0,0,s,s).data;
+  const dd = d.getContext('2d').getImageData(0,0,s,s).data;
+
+  // 가이드 글자 픽셀 & 드로잉 픽셀 수집
+  let guidePixels=0, drawPixels=0, overlap=0, outside=0;
+  for (let i=3; i<gd.length; i+=4) {
+    const gOn = gd[i] > 20;
+    const dOn = dd[i] > 20;
+    if (gOn) guidePixels++;
+    if (dOn) {
+      drawPixels++;
+      if (gOn) overlap++;
+      else outside++;
+    }
   }
-  if (drawP===0) { document.getElementById('scoreText').textContent='Draw something first!'; return; }
-  const coverage = guideP>0 ? Math.min(overlap/guideP,1) : 0;
-  const precision = drawP>0 ? Math.min(overlap/drawP,1) : 0;
-  const score = Math.round(Math.min((coverage*0.6+precision*0.4)*140, 100));
+  if (drawPixels === 0) {
+    document.getElementById('scoreText').textContent = 'Draw something first!';
+    return;
+  }
+
+  // 1. 커버리지: 가이드 글자를 얼마나 채웠나 (0~1)
+  const coverage = guidePixels > 0 ? overlap / guidePixels : 0;
+
+  // 2. 정확도: 그린 획이 글자 안에 있는 비율 (0~1)
+  const precision = drawPixels > 0 ? overlap / drawPixels : 0;
+
+  // 3. 획 양 체크: 너무 많이 그리거나 너무 적게 그리면 감점
+  const ratio = drawPixels / Math.max(guidePixels, 1);
+  // 이상적 비율 0.4~1.6 (붓 두께 감안)
+  const ratioScore = ratio < 0.15 ? ratio / 0.15        // 너무 적게
+                   : ratio > 2.5  ? Math.max(0, 1 - (ratio-2.5)*0.3) // 너무 많이
+                   : 1;
+
+  // 4. 최종 점수 — 엄격하게
+  // coverage 50% + precision 35% + ratio 15%
+  const raw = (coverage * 0.50 + precision * 0.35 + ratioScore * 0.15);
+  // 보정 없이 그대로 — 80점 이상 받으려면 진짜 잘 써야 함
+  const score = Math.round(Math.min(raw * 100, 100));
+
   const color = OBANGSAEK[currentIdx%OBANGSAEK.length];
   document.getElementById('scoreFill').style.background = color;
-  document.getElementById('scoreFill').style.width = score+'%';
-  const msgs = ['Keep practicing! 연습이 필요해요','Try again! 다시 해봐요','Getting there! 잘하고 있어요','Good job! 잘했어요','Perfect! 완벽해요'];
-  const msgIdx = score>=85?4:score>=65?3:score>=45?2:score>=25?1:0;
+  document.getElementById('scoreFill').style.width = score + '%';
+
+  const msgs = [
+    'Start over — 처음부터 다시!',
+    'Keep practicing — 연습이 필요해요',
+    'Not quite — 조금 더 해봐요',
+    'Getting there — 잘하고 있어요',
+    'Good job — 잘했어요!',
+    'Perfect — 완벽해요! 🎉'
+  ];
+  const msgIdx = score>=90?5 : score>=75?4 : score>=55?3 : score>=35?2 : score>=15?1 : 0;
   document.getElementById('scoreText').textContent = `${score} — ${msgs[msgIdx]}`;
 }
 
@@ -463,219 +500,210 @@ function setupDrawing() {
 
 window.addEventListener('resize', () => { if(document.getElementById('practicePage').style.display!=='none') selectChar(currentIdx); });
 
-// ── 단청 배경 애니메이션 ──
+// ── 배경 애니메이션 — 민화 패턴 + 연 ──
 (function() {
   const canvas = document.getElementById('bg-canvas');
   const ctx = canvas.getContext('2d');
 
-  const COLORS = {
-    blue:   '#1A4A8A',
-    red:    '#C84B31',
-    yellow: '#C8960C',
-    green:  '#2E7D32',
-    pink:   '#d4789a',
-    teal:   '#2a8a7a',
-  };
+  const C = { blue:'#1A4A8A', red:'#C84B31', yellow:'#C8960C', green:'#2E7D32', pink:'#d4607a', teal:'#1a7a6a', purple:'#6a3a9a' };
+  const ALL = Object.values(C);
 
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
 
-  // 구름 데이터
-  const clouds = [
-    { x: 120, y: 80,  r: 52, color: COLORS.blue,   speed: 0.18, phase: 0 },
-    { x: 600, y: 50,  r: 44, color: COLORS.red,    speed: 0.12, phase: 1.2 },
-    { x: 900, y: 140, r: 38, color: COLORS.yellow,  speed: 0.15, phase: 2.4 },
-    { x: 300, y: 200, r: 30, color: COLORS.teal,   speed: 0.10, phase: 0.8 },
-    { x: 1100,y: 90,  r: 46, color: COLORS.pink,   speed: 0.14, phase: 3.1 },
-    { x: 70,  y: 300, r: 35, color: COLORS.green,  speed: 0.16, phase: 1.8 },
-    { x: 750, y: 320, r: 50, color: COLORS.blue,   speed: 0.11, phase: 0.4 },
-    { x: 450, y: 60,  r: 28, color: COLORS.yellow,  speed: 0.20, phase: 2.0 },
-  ];
-
-  // 연(kite) 데이터
-  const kites = [
-    { x: 200,  y: 150, vx: 0.4, vy: -0.15, angle: -0.3, colors: [COLORS.red, COLORS.yellow],   tailLen: 120, phase: 0 },
-    { x: 700,  y: 100, vx: 0.3, vy: -0.10, angle: -0.2, colors: [COLORS.blue, COLORS.teal],    tailLen: 100, phase: 1.5 },
-    { x: 1000, y: 200, vx: 0.5, vy: -0.20, angle: -0.4, colors: [COLORS.yellow, COLORS.green], tailLen: 90,  phase: 3 },
-  ];
-
-  function drawCloud(ctx, x, y, r, color, t) {
-    const wobble = Math.sin(t * 0.8) * 3;
+  // ── 패턴 타일 (민화 모티프) ──
+  function drawPatternTile(ctx, x, y, size, color, type, alpha) {
     ctx.save();
-    ctx.globalAlpha = 0.08;
-
-    // 구름 여러 겹 — 단청 스타일
-    const layers = [
-      { rx: r*1.0, ry: r*0.65, ox: 0,      oy: 0,      color: color },
-      { rx: r*0.7, ry: r*0.5,  ox: r*0.35, oy: -r*0.2, color: lighten(color) },
-      { rx: r*0.55,ry: r*0.4,  ox: -r*0.3, oy: -r*0.15,color: darken(color) },
-      { rx: r*0.4, ry: r*0.3,  ox: r*0.1,  oy: -r*0.35,color: color },
-    ];
-
-    layers.forEach(l => {
-      ctx.globalAlpha = 0.07;
-      ctx.fillStyle = l.color;
-      ctx.beginPath();
-      ctx.ellipse(x + l.ox + wobble, y + l.oy, l.rx, l.ry, 0, 0, Math.PI*2);
-      ctx.fill();
-    });
-
-    // 윤곽선
-    ctx.globalAlpha = 0.12;
+    ctx.globalAlpha = alpha;
     ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(x + wobble, y, r, r*0.65, 0, 0, Math.PI*2);
-    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1.2;
+    const h = size/2;
 
-    // 흰 하이라이트
-    ctx.globalAlpha = 0.06;
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.ellipse(x + wobble*0.5, y - r*0.15, r*0.6, r*0.35, -0.2, 0, Math.PI*2);
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  function drawKite(ctx, kite, t) {
-    const { x, y, angle, colors, tailLen, phase } = kite;
-    const w = 18, h = 26;
-    const sway = Math.sin(t * 0.5 + phase) * 0.15;
-    const bob  = Math.sin(t * 0.7 + phase) * 4;
-
-    ctx.save();
-    ctx.translate(x, y + bob);
-    ctx.rotate(angle + sway);
-    ctx.globalAlpha = 0.5;
-
-    // 연 몸통 — 마름모 4등분
-    const [c1, c2] = colors;
-    // 위
-    ctx.fillStyle = c1;
-    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(w,0); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-    // 오른
-    ctx.fillStyle = c2;
-    ctx.beginPath(); ctx.moveTo(w,0); ctx.lineTo(0,h*0.6); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-    // 아래
-    ctx.fillStyle = c1;
-    ctx.beginPath(); ctx.moveTo(0,h*0.6); ctx.lineTo(-w,0); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-    // 왼
-    ctx.fillStyle = c2;
-    ctx.beginPath(); ctx.moveTo(-w,0); ctx.lineTo(0,-h); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
-
-    // 중심선
-    ctx.globalAlpha = 0.7;
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(0,h*0.6); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(-w,0); ctx.lineTo(w,0); ctx.stroke();
-
-    // 테두리
-    ctx.globalAlpha = 0.4;
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0,-h); ctx.lineTo(w,0); ctx.lineTo(0,h*0.6); ctx.lineTo(-w,0); ctx.closePath();
-    ctx.stroke();
-
-    ctx.restore();
-
-    // 연실 — 바람에 흔들리는 베지어 곡선
-    ctx.save();
-    ctx.globalAlpha = 0.25;
-    ctx.strokeStyle = '#888';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(x, y + bob + h*0.6);
-    const cx1 = x + Math.sin(t*0.3 + phase)*20 + 15;
-    const cy1 = y + bob + tailLen*0.4;
-    const cx2 = x + Math.sin(t*0.4 + phase)*30 - 10;
-    const cy2 = y + bob + tailLen*0.75;
-    const ex  = x + Math.sin(t*0.5 + phase)*40;
-    const ey  = y + bob + tailLen;
-    ctx.bezierCurveTo(cx1, cy1, cx2, cy2, ex, ey);
-    ctx.stroke();
-
-    // 꼬리 장식 리본들
-    ctx.globalAlpha = 0.35;
-    for (let i = 0; i < 4; i++) {
-      const tt = i / 3;
-      const tx = x + (cx1*(1-tt)*tt*3 + cx2*tt*tt*(1-tt)*3 + ex*tt*tt*tt)*0.8 + Math.sin(t*0.6+i)*8;
-      const ty = y + bob + tailLen * (0.3 + i*0.18);
-      const ribbonColor = i%2===0 ? colors[0] : colors[1];
-      ctx.fillStyle = ribbonColor;
+    if (type === 0) {
+      // 마름모 + 내부 십자
+      ctx.beginPath(); ctx.moveTo(x,y-h); ctx.lineTo(x+h,y); ctx.lineTo(x,y+h); ctx.lineTo(x-h,y); ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x,y-h*0.5); ctx.lineTo(x,y+h*0.5); ctx.moveTo(x-h*0.5,y); ctx.lineTo(x+h*0.5,y); ctx.stroke();
+    } else if (type === 1) {
+      // 꽃 모양 (6각)
+      for (let i=0;i<6;i++) {
+        const a = (i/6)*Math.PI*2;
+        const bx = x+Math.cos(a)*h*0.5, by = y+Math.sin(a)*h*0.5;
+        ctx.beginPath(); ctx.arc(bx, by, h*0.28, 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(x, y, h*0.2, 0, Math.PI*2); ctx.fill();
+    } else if (type === 2) {
+      // 빗금 격자
+      for (let i=-1;i<=1;i++) {
+        ctx.beginPath(); ctx.moveTo(x-h, y+i*h*0.6); ctx.lineTo(x+h, y+i*h*0.6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+i*h*0.6, y-h); ctx.lineTo(x+i*h*0.6, y+h); ctx.stroke();
+      }
+    } else if (type === 3) {
+      // 소용돌이 (단청 구름)
       ctx.beginPath();
-      ctx.ellipse(tx, ty, 5, 3, Math.sin(t+i)*0.5, 0, Math.PI*2);
-      ctx.fill();
+      for (let i=0;i<60;i++) {
+        const a = i*0.22, r = h*0.1+i*h*0.012;
+        const px = x+Math.cos(a)*r, py = y+Math.sin(a)*r;
+        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    } else if (type === 4) {
+      // 삼각 패턴
+      ctx.beginPath(); ctx.moveTo(x-h,y+h); ctx.lineTo(x,y-h); ctx.lineTo(x+h,y+h); ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x-h*0.5,y); ctx.lineTo(x+h*0.5,y); ctx.stroke();
+    } else if (type === 5) {
+      // 동그라미 겹치기
+      ctx.beginPath(); ctx.arc(x,y,h*0.7,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x,y,h*0.4,0,Math.PI*2); ctx.fill();
+    } else if (type === 6) {
+      // 물결 (파도)
+      ctx.beginPath();
+      for (let i=0;i<=20;i++) {
+        const px = x-h+i*h*0.1;
+        const py = y+Math.sin(i*0.6)*h*0.4;
+        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    } else {
+      // 별 모양
+      for (let i=0;i<8;i++) {
+        const a = (i/8)*Math.PI*2;
+        const r = i%2===0 ? h*0.8 : h*0.35;
+        const px = x+Math.cos(a)*r, py = y+Math.sin(a)*r;
+        i===0 ? ctx.beginPath() && ctx.moveTo(px,py) : ctx.lineTo(px,py);
+        if (i===0) { ctx.beginPath(); ctx.moveTo(px,py); }
+        else ctx.lineTo(px,py);
+      }
+      ctx.closePath(); ctx.stroke();
     }
     ctx.restore();
   }
 
-  // 파도 그리기
-  function drawWaves(ctx, t, W, H) {
-    const waves = [
-      { y: H*0.88, amp: 6, freq: 0.008, speed: 0.4, color: COLORS.blue,   alpha: 0.05 },
-      { y: H*0.90, amp: 4, freq: 0.012, speed: 0.6, color: COLORS.yellow,  alpha: 0.04 },
-      { y: H*0.92, amp: 5, freq: 0.009, speed: 0.3, color: COLORS.teal,   alpha: 0.05 },
-    ];
-    waves.forEach(w => {
-      ctx.save();
-      ctx.globalAlpha = w.alpha;
-      ctx.strokeStyle = w.color;
-      ctx.lineWidth = 1.5;
+  // 패턴 타일 배치
+  const tiles = [];
+  function initTiles() {
+    tiles.length = 0;
+    const W = canvas.width, H = canvas.height;
+    const count = Math.floor(W*H/18000);
+    for (let i=0;i<count;i++) {
+      tiles.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        size: 18+Math.random()*32,
+        color: ALL[Math.floor(Math.random()*ALL.length)],
+        type: Math.floor(Math.random()*8),
+        alpha: 0.04+Math.random()*0.07,
+        vx: (Math.random()-0.5)*0.3,
+        vy: -0.05-Math.random()*0.2,
+        rot: Math.random()*Math.PI*2,
+        rotV: (Math.random()-0.5)*0.005,
+      });
+    }
+  }
+  initTiles();
+  window.addEventListener('resize', initTiles);
+
+  // 연(kite)
+  const kites = Array.from({length:3}, (_, i) => ({
+    x: (i+0.5) * (window.innerWidth/3),
+    y: 80+Math.random()*200,
+    vx: 0.3+Math.random()*0.3,
+    vy: -0.05-Math.random()*0.1,
+    size: 22+Math.random()*14,
+    c1: ALL[i*2%ALL.length],
+    c2: ALL[(i*2+1)%ALL.length],
+    phase: i*2.1,
+    tailLen: 90+Math.random()*60,
+  }));
+
+  function drawKite(k, t) {
+    const bob = Math.sin(t*0.6+k.phase)*5;
+    const sway = Math.sin(t*0.4+k.phase)*0.12;
+    const x=k.x, y=k.y+bob, s=k.size;
+    ctx.save();
+    ctx.translate(x,y); ctx.rotate(sway-0.25);
+    ctx.globalAlpha=0.55;
+
+    // 4등분 마름모
+    [[0,-s,s,0,k.c1],[s,0,0,s*0.7,k.c2],[0,s*0.7,-s,0,k.c1],[-s,0,0,-s,k.c2]].forEach(([x1,y1,x2,y2,c])=>{
+      ctx.fillStyle=c; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(x1,y1); ctx.lineTo(x2,y2); ctx.closePath(); ctx.fill();
+    });
+    // 테두리 + 중심선
+    ctx.globalAlpha=0.5; ctx.strokeStyle='#fff'; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(s,0); ctx.lineTo(0,s*0.7); ctx.lineTo(-s,0); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-s); ctx.lineTo(0,s*0.7); ctx.moveTo(-s,0); ctx.lineTo(s,0); ctx.stroke();
+    ctx.restore();
+
+    // 연실
+    ctx.save(); ctx.globalAlpha=0.2; ctx.strokeStyle='#aaa'; ctx.lineWidth=0.7;
+    ctx.beginPath(); ctx.moveTo(x,y+s*0.7);
+    const cx1=x+Math.sin(t*0.3+k.phase)*18, cy1=y+k.tailLen*0.4;
+    const cx2=x+Math.sin(t*0.4+k.phase)*28, cy2=y+k.tailLen*0.75;
+    const ex=x+Math.sin(t*0.5+k.phase)*36, ey=y+k.tailLen;
+    ctx.bezierCurveTo(cx1,cy1,cx2,cy2,ex,ey); ctx.stroke();
+    // 꼬리 리본
+    for (let i=0;i<4;i++) {
+      const ri=i/3;
+      const rx=x+(cx1*ri+ex*(1-ri)*0.3)+Math.sin(t*0.7+i)*6;
+      const ry=y+k.tailLen*(0.25+i*0.2);
+      ctx.globalAlpha=0.4; ctx.fillStyle=i%2===0?k.c1:k.c2;
+      ctx.beginPath(); ctx.ellipse(rx,ry,5,3,Math.sin(t+i)*0.6,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // 파도
+  function drawWaves(t) {
+    const W=canvas.width, H=canvas.height;
+    [[H*0.88,7,0.007,0.35,C.blue,0.06],[H*0.91,5,0.011,0.55,C.yellow,0.05],[H*0.94,4,0.009,0.28,C.teal,0.05]].forEach(([wy,amp,freq,spd,col,a])=>{
+      ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle=col; ctx.lineWidth=1.5;
       ctx.beginPath();
-      for (let x = 0; x <= W; x += 2) {
-        const y = w.y + Math.sin(x * w.freq + t * w.speed) * w.amp;
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      for (let x=0;x<=W;x+=2) {
+        const y=wy+Math.sin(x*freq+t*spd)*amp;
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
       }
-      ctx.stroke();
+      ctx.stroke(); ctx.restore();
+    });
+  }
+
+  let t=0;
+  function animate() {
+    const W=canvas.width, H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    // 패턴 타일
+    tiles.forEach(tile => {
+      tile.x += tile.vx;
+      tile.y += tile.vy;
+      tile.rot += tile.rotV;
+      if (tile.y < -tile.size*2) { tile.y=H+tile.size; tile.x=Math.random()*W; }
+      if (tile.x < -tile.size*2) tile.x=W+tile.size;
+      if (tile.x > W+tile.size*2) tile.x=-tile.size;
+
+      ctx.save();
+      ctx.translate(tile.x, tile.y);
+      ctx.rotate(tile.rot);
+      ctx.translate(-tile.x, -tile.y);
+      drawPatternTile(ctx, tile.x, tile.y, tile.size, tile.color, tile.type, tile.alpha);
       ctx.restore();
     });
-  }
 
-  function lighten(hex) {
-    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-    return `rgb(${Math.min(255,r+60)},${Math.min(255,g+60)},${Math.min(255,b+60)})`;
-  }
-  function darken(hex) {
-    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-    return `rgb(${Math.max(0,r-40)},${Math.max(0,g-40)},${Math.max(0,b-40)})`;
-  }
-
-  let t = 0;
-  function animate() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-
-    // 구름 이동 + 그리기
-    clouds.forEach(c => {
-      c.x += c.speed;
-      if (c.x - c.r > W + 100) c.x = -c.r - 100;
-      drawCloud(ctx, c.x, c.y, c.r, c.color, t + c.phase);
-    });
-
-    // 연 이동
+    // 연
     kites.forEach(k => {
       k.x += k.vx;
-      k.y += k.vy;
-      if (k.x > W + 100) { k.x = -80; k.y = 80 + Math.random() * H * 0.4; }
-      drawKite(ctx, k, t);
+      k.y += k.vy * Math.sin(t*0.02+k.phase)*0.3;
+      if (k.x > W+100) { k.x=-80; k.y=60+Math.random()*H*0.35; }
+      drawKite(k, t);
     });
 
-    // 파도
-    drawWaves(ctx, t, W, H);
-
-    t += 0.02;
+    drawWaves(t);
+    t += 0.018;
     requestAnimationFrame(animate);
   }
   animate();
 })();
+
 
 </script>
 </body>
