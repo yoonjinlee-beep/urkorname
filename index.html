@@ -15,6 +15,8 @@
       --font-korean: 'Noto Sans KR', sans-serif;
     }
     html, body { min-height: 100%; background: var(--white); color: var(--black); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
+    #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    #mainPage, #practicePage { position: relative; z-index: 1; }
 
     #mainPage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem clamp(1.5rem, 8vw, 8rem) 6rem; text-align: center; }
     .site-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 5rem; opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards; }
@@ -96,6 +98,7 @@
   </style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
 
 <div id="mainPage">
   <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
@@ -459,6 +462,221 @@ function setupDrawing() {
 }
 
 window.addEventListener('resize', () => { if(document.getElementById('practicePage').style.display!=='none') selectChar(currentIdx); });
+
+// ── 단청 배경 애니메이션 ──
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const COLORS = {
+    blue:   '#1A4A8A',
+    red:    '#C84B31',
+    yellow: '#C8960C',
+    green:  '#2E7D32',
+    pink:   '#d4789a',
+    teal:   '#2a8a7a',
+  };
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // 구름 데이터
+  const clouds = [
+    { x: 120, y: 80,  r: 52, color: COLORS.blue,   speed: 0.18, phase: 0 },
+    { x: 600, y: 50,  r: 44, color: COLORS.red,    speed: 0.12, phase: 1.2 },
+    { x: 900, y: 140, r: 38, color: COLORS.yellow,  speed: 0.15, phase: 2.4 },
+    { x: 300, y: 200, r: 30, color: COLORS.teal,   speed: 0.10, phase: 0.8 },
+    { x: 1100,y: 90,  r: 46, color: COLORS.pink,   speed: 0.14, phase: 3.1 },
+    { x: 70,  y: 300, r: 35, color: COLORS.green,  speed: 0.16, phase: 1.8 },
+    { x: 750, y: 320, r: 50, color: COLORS.blue,   speed: 0.11, phase: 0.4 },
+    { x: 450, y: 60,  r: 28, color: COLORS.yellow,  speed: 0.20, phase: 2.0 },
+  ];
+
+  // 연(kite) 데이터
+  const kites = [
+    { x: 200,  y: 150, vx: 0.4, vy: -0.15, angle: -0.3, colors: [COLORS.red, COLORS.yellow],   tailLen: 120, phase: 0 },
+    { x: 700,  y: 100, vx: 0.3, vy: -0.10, angle: -0.2, colors: [COLORS.blue, COLORS.teal],    tailLen: 100, phase: 1.5 },
+    { x: 1000, y: 200, vx: 0.5, vy: -0.20, angle: -0.4, colors: [COLORS.yellow, COLORS.green], tailLen: 90,  phase: 3 },
+  ];
+
+  function drawCloud(ctx, x, y, r, color, t) {
+    const wobble = Math.sin(t * 0.8) * 3;
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+
+    // 구름 여러 겹 — 단청 스타일
+    const layers = [
+      { rx: r*1.0, ry: r*0.65, ox: 0,      oy: 0,      color: color },
+      { rx: r*0.7, ry: r*0.5,  ox: r*0.35, oy: -r*0.2, color: lighten(color) },
+      { rx: r*0.55,ry: r*0.4,  ox: -r*0.3, oy: -r*0.15,color: darken(color) },
+      { rx: r*0.4, ry: r*0.3,  ox: r*0.1,  oy: -r*0.35,color: color },
+    ];
+
+    layers.forEach(l => {
+      ctx.globalAlpha = 0.07;
+      ctx.fillStyle = l.color;
+      ctx.beginPath();
+      ctx.ellipse(x + l.ox + wobble, y + l.oy, l.rx, l.ry, 0, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // 윤곽선
+    ctx.globalAlpha = 0.12;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(x + wobble, y, r, r*0.65, 0, 0, Math.PI*2);
+    ctx.stroke();
+
+    // 흰 하이라이트
+    ctx.globalAlpha = 0.06;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(x + wobble*0.5, y - r*0.15, r*0.6, r*0.35, -0.2, 0, Math.PI*2);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawKite(ctx, kite, t) {
+    const { x, y, angle, colors, tailLen, phase } = kite;
+    const w = 18, h = 26;
+    const sway = Math.sin(t * 0.5 + phase) * 0.15;
+    const bob  = Math.sin(t * 0.7 + phase) * 4;
+
+    ctx.save();
+    ctx.translate(x, y + bob);
+    ctx.rotate(angle + sway);
+    ctx.globalAlpha = 0.5;
+
+    // 연 몸통 — 마름모 4등분
+    const [c1, c2] = colors;
+    // 위
+    ctx.fillStyle = c1;
+    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(w,0); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+    // 오른
+    ctx.fillStyle = c2;
+    ctx.beginPath(); ctx.moveTo(w,0); ctx.lineTo(0,h*0.6); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+    // 아래
+    ctx.fillStyle = c1;
+    ctx.beginPath(); ctx.moveTo(0,h*0.6); ctx.lineTo(-w,0); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+    // 왼
+    ctx.fillStyle = c2;
+    ctx.beginPath(); ctx.moveTo(-w,0); ctx.lineTo(0,-h); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+
+    // 중심선
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(0,-h); ctx.lineTo(0,h*0.6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-w,0); ctx.lineTo(w,0); ctx.stroke();
+
+    // 테두리
+    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0,-h); ctx.lineTo(w,0); ctx.lineTo(0,h*0.6); ctx.lineTo(-w,0); ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+
+    // 연실 — 바람에 흔들리는 베지어 곡선
+    ctx.save();
+    ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(x, y + bob + h*0.6);
+    const cx1 = x + Math.sin(t*0.3 + phase)*20 + 15;
+    const cy1 = y + bob + tailLen*0.4;
+    const cx2 = x + Math.sin(t*0.4 + phase)*30 - 10;
+    const cy2 = y + bob + tailLen*0.75;
+    const ex  = x + Math.sin(t*0.5 + phase)*40;
+    const ey  = y + bob + tailLen;
+    ctx.bezierCurveTo(cx1, cy1, cx2, cy2, ex, ey);
+    ctx.stroke();
+
+    // 꼬리 장식 리본들
+    ctx.globalAlpha = 0.35;
+    for (let i = 0; i < 4; i++) {
+      const tt = i / 3;
+      const tx = x + (cx1*(1-tt)*tt*3 + cx2*tt*tt*(1-tt)*3 + ex*tt*tt*tt)*0.8 + Math.sin(t*0.6+i)*8;
+      const ty = y + bob + tailLen * (0.3 + i*0.18);
+      const ribbonColor = i%2===0 ? colors[0] : colors[1];
+      ctx.fillStyle = ribbonColor;
+      ctx.beginPath();
+      ctx.ellipse(tx, ty, 5, 3, Math.sin(t+i)*0.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // 파도 그리기
+  function drawWaves(ctx, t, W, H) {
+    const waves = [
+      { y: H*0.88, amp: 6, freq: 0.008, speed: 0.4, color: COLORS.blue,   alpha: 0.05 },
+      { y: H*0.90, amp: 4, freq: 0.012, speed: 0.6, color: COLORS.yellow,  alpha: 0.04 },
+      { y: H*0.92, amp: 5, freq: 0.009, speed: 0.3, color: COLORS.teal,   alpha: 0.05 },
+    ];
+    waves.forEach(w => {
+      ctx.save();
+      ctx.globalAlpha = w.alpha;
+      ctx.strokeStyle = w.color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 2) {
+        const y = w.y + Math.sin(x * w.freq + t * w.speed) * w.amp;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  function lighten(hex) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return `rgb(${Math.min(255,r+60)},${Math.min(255,g+60)},${Math.min(255,b+60)})`;
+  }
+  function darken(hex) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return `rgb(${Math.max(0,r-40)},${Math.max(0,g-40)},${Math.max(0,b-40)})`;
+  }
+
+  let t = 0;
+  function animate() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // 구름 이동 + 그리기
+    clouds.forEach(c => {
+      c.x += c.speed;
+      if (c.x - c.r > W + 100) c.x = -c.r - 100;
+      drawCloud(ctx, c.x, c.y, c.r, c.color, t + c.phase);
+    });
+
+    // 연 이동
+    kites.forEach(k => {
+      k.x += k.vx;
+      k.y += k.vy;
+      if (k.x > W + 100) { k.x = -80; k.y = 80 + Math.random() * H * 0.4; }
+      drawKite(ctx, k, t);
+    });
+
+    // 파도
+    drawWaves(ctx, t, W, H);
+
+    t += 0.02;
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
 </script>
 </body>
 </html>
