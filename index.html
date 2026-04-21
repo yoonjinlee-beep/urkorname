@@ -156,7 +156,7 @@
 </div>
 
 <script>
-const OBANGSAEK = ['#1A4A8A','#C84B31','#C8960C','#2E7D32','#555'];
+const OBANGSAEK = ['#1A4A8A','#FF4FA3','#FFB830','#2ECFB0','#FF3355'];
 let currentChars = [], currentIdx = 0;
 let isDrawing = false, lastX = 0, lastY = 0;
 const synth = window.speechSynthesis;
@@ -504,7 +504,16 @@ window.addEventListener('resize', () => { if(document.getElementById('practicePa
 (function() {
   const canvas = document.getElementById('bg-canvas');
   const ctx = canvas.getContext('2d');
-  const C = { blue:'#1A4A8A', red:'#C84B31', yellow:'#C8960C', green:'#2E7D32', pink:'#c45a7a', teal:'#1a7a6a' };
+  const C = { 
+    pink:   '#FF4FA3',
+    mint:   '#2ECFB0',
+    coral:  '#FF6B4A',
+    lavender:'#9B6FE8',
+    gold:   '#FFB830',
+    sky:    '#4FC3F7',
+    green:  '#3DD68C',
+    red:    '#FF3355',
+  };
   const ALL = Object.values(C);
 
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -514,7 +523,7 @@ window.addEventListener('resize', () => { if(document.getElementById('practicePa
   // 단청 구름무늬 (운문) — 전통 소용돌이 구름
   function drawUnmun(ctx, x, y, size, color, t) {
     ctx.save();
-    ctx.globalAlpha = 0.1;
+    ctx.globalAlpha = 0.18;
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
 
@@ -558,7 +567,7 @@ window.addEventListener('resize', () => { if(document.getElementById('practicePa
   // 단청 꽃무늬 (연화문) — 연꽃
   function drawYeonhwa(ctx, x, y, size, color, t) {
     ctx.save();
-    ctx.globalAlpha = 0.09;
+    ctx.globalAlpha = 0.16;
     ctx.strokeStyle = color;
     const s = size;
     const rot = t * 0.008;
@@ -703,9 +712,9 @@ window.addEventListener('resize', () => { if(document.getElementById('practicePa
   function drawWaves(t) {
     const W = canvas.width, H = canvas.height;
     [
-      [H * 0.87, 6, 0.007, 0.3, C.blue,   0.06],
-      [H * 0.90, 4, 0.011, 0.5, C.teal,   0.05],
-      [H * 0.93, 5, 0.009, 0.25, C.yellow, 0.04],
+      [H * 0.87, 6, 0.007, 0.3, C.sky,   0.10],
+      [H * 0.90, 4, 0.011, 0.5, C.mint,  0.09],
+      [H * 0.93, 5, 0.009, 0.25, C.pink, 0.08],
     ].forEach(([wy, amp, freq, spd, col, a]) => {
       ctx.save();
       ctx.globalAlpha = a;
@@ -746,9 +755,9 @@ window.addEventListener('resize', () => { if(document.getElementById('practicePa
 
   // 연 초기화
   const kites = [
-    { x: 180,  y: 120, vx: 0.35, size: 20, c1: C.red,    c2: C.blue,   phase: 0,   tailLen: 110 },
-    { x: 650,  y: 90,  vx: 0.28, size: 16, c1: C.blue,   c2: C.yellow, phase: 2.0, tailLen: 90  },
-    { x: 1050, y: 160, vx: 0.42, size: 22, c1: C.yellow, c2: C.green,  phase: 4.0, tailLen: 120 },
+    { x: 180,  y: 120, vx: 0.35, size: 20, c1: C.pink,   c2: C.sky,    phase: 0,   tailLen: 110 },
+    { x: 650,  y: 90,  vx: 0.28, size: 16, c1: C.sky,    c2: C.gold,   phase: 2.0, tailLen: 90  },
+    { x: 1050, y: 160, vx: 0.42, size: 22, c1: C.gold,   c2: C.mint,   phase: 4.0, tailLen: 120 },
   ];
 
   let t = 0;
