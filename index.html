@@ -345,11 +345,13 @@ function drawGuide(char, color) {
   ctx.beginPath();ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);ctx.stroke();
   ctx.beginPath();ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);ctx.stroke();
 
-  // 가이드 글자
+  // 가이드 글자 — 연하게
+  ctx.globalAlpha = 0.12;
   ctx.fillStyle = color;
   ctx.font = `900 ${Math.floor(s*0.82)}px 'Noto Sans KR', sans-serif`;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(char, s/2, s/2+s*0.03);
+  ctx.globalAlpha = 1;
 }
 
 function buildStrokeSteps(char, color) {
@@ -446,8 +448,8 @@ function getPos(e, canvas) {
 function setupDrawing() {
   const canvas = document.getElementById('drawCanvas');
   const ctx = canvas.getContext('2d');
-  ctx.strokeStyle='#0a0a0a'; ctx.lineWidth=8; ctx.lineCap='round'; ctx.lineJoin='round';
-  const start = e => { e.preventDefault(); isDrawing=true; const p=getPos(e,canvas); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(lastX,lastY,4,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill(); };
+  ctx.strokeStyle='#0a0a0a'; ctx.lineWidth=18; ctx.lineCap='round'; ctx.lineJoin='round';
+  const start = e => { e.preventDefault(); isDrawing=true; const p=getPos(e,canvas); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(lastX,lastY,9,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill(); };
   const draw = e => { e.preventDefault(); if(!isDrawing) return; const p=getPos(e,canvas); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; };
   const stop = e => { e.preventDefault(); isDrawing=false; };
   canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',draw);
