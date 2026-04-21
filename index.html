@@ -16,8 +16,7 @@
     }
     html, body { min-height: 100%; background: var(--white); color: var(--black); font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
 
-    /* ── MAIN PAGE ── */
-    #mainPage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem clamp(1.5rem, 8vw, 8rem); padding-bottom: 6rem; text-align: center; }
+    #mainPage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem clamp(1.5rem, 8vw, 8rem) 6rem; text-align: center; }
     .site-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 5rem; opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards; }
     .input-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 0.6rem; opacity: 0; animation: fadeUp 0.9s 0.2s ease forwards; }
     #nameInput { font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 4.5rem); color: var(--black); background: transparent; border: none; border-bottom: 1.5px solid var(--gray-light); outline: none; width: 100%; max-width: 500px; padding-bottom: 0.4rem; text-align: center; letter-spacing: 0.08em; transition: border-color 0.25s; caret-color: var(--red); opacity: 0; animation: fadeUp 0.9s 0.25s ease forwards; }
@@ -31,7 +30,7 @@
     .loader-dot:nth-child(1) { background: var(--blue); animation-delay: 0s; }
     .loader-dot:nth-child(2) { background: var(--red); animation-delay: 0.22s; }
     .loader-dot:nth-child(3) { background: var(--yellow); animation-delay: 0.44s; }
-    #results { display: none; width: 100%; max-width: 600px; }
+    #results { display: none; width: 100%; max-width: 640px; }
     .step-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #ccc; margin-bottom: 0.4rem; }
     #translit { font-family: var(--font-korean); font-size: clamp(1rem, 2vw, 1.3rem); color: #ccc; margin-bottom: 2rem; opacity: 0; transform: translateY(8px); transition: opacity 0.6s, transform 0.6s; }
     #translit.show { opacity: 1; transform: translateY(0); }
@@ -42,7 +41,7 @@
     .char-unit.show { opacity: 1; transform: translateY(0); }
     .hangul-char { font-family: var(--font-korean); font-weight: 900; font-size: clamp(4rem, 12vw, 7rem); line-height: 1; transition: transform 0.15s ease, opacity 0.15s ease; display: block; }
     .char-unit:hover .hangul-char { transform: scale(1.06); opacity: 0.7; }
-    .sound-hint { font-size: 8px; letter-spacing: 0.1em; color: #ddd; text-transform: uppercase; margin-top: 2px; opacity: 0; transition: opacity 0.2s; }
+    .sound-hint { font-size: 8px; letter-spacing: 0.1em; color: #ddd; text-transform: uppercase; margin-top: 2px; opacity: 0; transition: opacity 0.2s; font-family: var(--font-display); }
     .char-unit:hover .sound-hint { opacity: 1; }
     .hanja-block { display: flex; flex-direction: column; align-items: center; margin-top: 8px; gap: 2px; }
     .hanja-sm { font-family: var(--font-korean); font-size: 0.8rem; color: #aaa; line-height: 1; }
@@ -56,45 +55,41 @@
     .btn-ghost { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 0; }
     .btn-ghost:hover { color: var(--black); }
 
-    /* ── PRACTICE PAGE ── */
-    #practicePage { display: none; min-height: 100vh; padding: 4rem clamp(1.5rem, 8vw, 8rem); max-width: 900px; margin: 0 auto; }
-    .practice-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
-    .practice-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray-mid); }
+    /* PRACTICE */
+    #practicePage { display: none; min-height: 100vh; padding: 4rem clamp(1.5rem, 6vw, 6rem); max-width: 860px; margin: 0 auto; }
+    .prac-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
+    .prac-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray-mid); }
     .char-tabs { display: flex; gap: 0.5rem; }
-    .char-tab { font-family: var(--font-korean); font-weight: 900; font-size: 1.8rem; cursor: pointer; padding: 0.3rem 0.8rem; border-bottom: 2px solid transparent; transition: all 0.2s; color: var(--gray-mid); }
+    .char-tab { font-family: var(--font-korean); font-weight: 900; font-size: 2rem; cursor: pointer; padding: 0.3rem 0.8rem; border-bottom: 2px solid transparent; transition: all 0.2s; color: #ccc; }
     .char-tab.active { border-bottom-color: currentColor; }
-    .practice-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
-    @media (max-width: 640px) { .practice-body { grid-template-columns: 1fr; gap: 2rem; } }
-
-    /* Canvas area */
+    .prac-body { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: start; }
+    @media (max-width: 600px) { .prac-body { grid-template-columns: 1fr; gap: 2rem; } }
     .canvas-section { display: flex; flex-direction: column; gap: 1rem; }
-    .canvas-wrap { position: relative; width: 100%; aspect-ratio: 1; max-width: 320px; }
-    .canvas-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 2px; }
-    .canvas-guide { opacity: 0.07; }
-    .canvas-draw { cursor: crosshair; }
-    .canvas-controls { display: flex; gap: 1rem; align-items: center; }
-    .btn-clear { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; background: none; border: 1px solid var(--gray-light); cursor: pointer; padding: 7px 14px; transition: all 0.2s; }
+    .canvas-wrap { position: relative; width: 100%; aspect-ratio: 1; max-width: 300px; border: 0.5px solid #f0f0f0; }
+    .canvas-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .canvas-controls { display: flex; gap: 0.8rem; }
+    .btn-sm { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 7px 14px; transition: all 0.2s; border-radius: 0; }
+    .btn-clear { color: #ccc; background: none; border: 0.5px solid var(--gray-light); }
     .btn-clear:hover { color: var(--black); border-color: var(--black); }
-    .btn-score { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: white; background: var(--black); border: none; cursor: pointer; padding: 7px 14px; transition: background 0.2s; }
+    .btn-score { color: white; background: var(--black); border: none; }
     .btn-score:hover { background: var(--blue); }
-    .score-display { font-size: 10px; letter-spacing: 0.1em; color: #aaa; font-family: var(--font-display); margin-top: 0.5rem; min-height: 20px; }
-    .score-bar { height: 3px; background: var(--gray-light); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
-    .score-fill { height: 100%; border-radius: 2px; width: 0; transition: width 0.8s ease; }
-
-    /* Info section */
-    .info-section { padding-top: 0.5rem; }
-    .char-big { font-family: var(--font-korean); font-weight: 900; font-size: 7rem; line-height: 1; margin-bottom: 0.8rem; }
-    .char-hanja { font-family: var(--font-korean); font-size: 1.2rem; color: #aaa; margin-bottom: 0.2rem; }
+    .score-area { min-height: 32px; }
+    .score-text { font-size: 10px; letter-spacing: 0.08em; color: #999; font-family: var(--font-display); margin-bottom: 6px; }
+    .score-bar { height: 2px; background: #f0f0f0; overflow: hidden; }
+    .score-fill { height: 100%; width: 0; transition: width 0.9s cubic-bezier(.4,0,.2,1); }
+    .info-section { padding-top: 0.3rem; }
+    .char-big { font-family: var(--font-korean); font-weight: 900; font-size: 6.5rem; line-height: 1; margin-bottom: 0.6rem; }
+    .char-hanja { font-family: var(--font-korean); font-size: 1.1rem; color: #bbb; margin-bottom: 0.2rem; }
     .char-meaning { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 2rem; }
-
-    /* Stroke order */
-    .stroke-order-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 0.8rem; }
-    .stroke-steps { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .stroke-step { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .stroke-canvas { border: 0.5px solid #eee; border-radius: 2px; }
-    .stroke-num { font-size: 8px; color: #ccc; font-family: var(--font-display); letter-spacing: 0.05em; }
-
-    .btn-back-wrap { margin-top: 3rem; }
+    .strokes-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 0.8rem; }
+    .stroke-steps { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .stroke-step { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+    .stroke-step svg { border: 0.5px solid #f0f0f0; transition: border-color 0.15s; }
+    .stroke-step:hover svg { border-color: #ccc; }
+    .stroke-num { font-size: 8px; color: #ccc; font-family: var(--font-display); }
+    .stroke-step.current svg { border-color: #aaa; }
+    .no-stroke-msg { font-size: 10px; color: #ddd; font-family: var(--font-display); letter-spacing: 0.08em; }
+    .back-btn-wrap { margin-top: 2.5rem; }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
     @keyframes pulse { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
@@ -102,7 +97,6 @@
 </head>
 <body>
 
-<!-- MAIN PAGE -->
 <div id="mainPage">
   <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
   <div class="input-label">Enter your name</div>
@@ -125,32 +119,33 @@
   </div>
 </div>
 
-<!-- PRACTICE PAGE -->
 <div id="practicePage">
-  <div class="practice-header">
-    <div class="practice-title">Practice writing — 획순 따라쓰기</div>
+  <div class="prac-header">
+    <div class="prac-title">Practice — 획순 따라쓰기</div>
     <div class="char-tabs" id="charTabs"></div>
   </div>
-  <div class="practice-body">
+  <div class="prac-body">
     <div class="canvas-section">
       <div class="canvas-wrap" id="canvasWrap">
-        <canvas id="guideCanvas" class="canvas-guide"></canvas>
-        <canvas id="drawCanvas" class="canvas-draw"></canvas>
+        <canvas id="guideCanvas"></canvas>
+        <canvas id="drawCanvas"></canvas>
       </div>
       <div class="canvas-controls">
-        <button class="btn-clear" onclick="clearDraw()">Clear</button>
-        <button class="btn-score" onclick="scoreDrawing()">Check score</button>
+        <button class="btn-sm btn-clear" onclick="clearDraw()">Clear</button>
+        <button class="btn-sm btn-score" onclick="scoreDrawing()">Check score</button>
       </div>
-      <div class="score-display" id="scoreDisplay"></div>
-      <div class="score-bar"><div class="score-fill" id="scoreFill"></div></div>
+      <div class="score-area">
+        <div class="score-text" id="scoreText"></div>
+        <div class="score-bar"><div class="score-fill" id="scoreFill"></div></div>
+      </div>
     </div>
     <div class="info-section">
-      <div class="char-big" id="practiceCharBig"></div>
-      <div class="char-hanja" id="practiceHanja"></div>
-      <div class="char-meaning" id="practiceMeaning"></div>
-      <div class="stroke-order-title">Stroke order — 획순</div>
+      <div class="char-big" id="charBig"></div>
+      <div class="char-hanja" id="charHanja"></div>
+      <div class="char-meaning" id="charMeaning"></div>
+      <div class="strokes-title">Stroke order — 획순</div>
       <div class="stroke-steps" id="strokeSteps"></div>
-      <div class="btn-back-wrap">
+      <div class="back-btn-wrap">
         <button class="btn-ghost" onclick="closePractice()">← Back to my name</button>
       </div>
     </div>
@@ -159,28 +154,16 @@
 
 <script>
 const OBANGSAEK = ['#1A4A8A','#C84B31','#C8960C','#2E7D32','#555'];
-let currentChars = [];
-let currentIdx = 0;
+let currentChars = [], currentIdx = 0;
 let isDrawing = false, lastX = 0, lastY = 0;
 const synth = window.speechSynthesis;
 let korVoice = null;
 
-function loadVoices() {
-  const v = synth.getVoices();
-  korVoice = v.find(x => x.lang.startsWith('ko')) || null;
-}
+function loadVoices() { const v = synth.getVoices(); korVoice = v.find(x => x.lang.startsWith('ko')) || null; }
 loadVoices();
 if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
-
-function speak(text) {
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ko-KR'; u.rate = 0.8; u.pitch = 1;
-  if (korVoice) u.voice = korVoice;
-  synth.speak(u);
-}
-
-function show(el, delay) { setTimeout(() => el.classList.add('show'), delay); }
+function speak(t) { synth.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang='ko-KR'; u.rate=0.8; if(korVoice) u.voice=korVoice; synth.speak(u); }
+function show(el, d) { setTimeout(() => el.classList.add('show'), d); }
 
 function resetMain() {
   const inp = document.getElementById('nameInput');
@@ -195,29 +178,23 @@ function resetMain() {
 function renderResult(data) {
   currentChars = data.characters;
   document.getElementById('results').style.display = 'block';
-  const translit = document.getElementById('translit');
-  translit.textContent = data.transliteration;
-  show(translit, 100);
+  const tr = document.getElementById('translit');
+  tr.textContent = data.transliteration;
+  show(tr, 100);
   show(document.getElementById('divider'), 420);
   const row = document.getElementById('koreanRow');
   data.characters.forEach((ch, i) => {
-    const unit = document.createElement('div');
-    unit.className = 'char-unit';
-    unit.onclick = () => speak(ch.hangul);
-    unit.innerHTML = `
-      <span class="hangul-char" style="color:${OBANGSAEK[i%OBANGSAEK.length]}">${ch.hangul}</span>
-      <span class="sound-hint">tap to hear</span>
-      <div class="hanja-block">
-        <span class="hanja-sm">${ch.hanja}</span>
-        <span class="meaning-sm">${ch.meaning}</span>
-      </div>`;
-    row.appendChild(unit);
-    show(unit, 720 + i * 300);
+    const u = document.createElement('div');
+    u.className = 'char-unit';
+    u.onclick = () => speak(ch.hangul);
+    u.innerHTML = `<span class="hangul-char" style="color:${OBANGSAEK[i%OBANGSAEK.length]}">${ch.hangul}</span><span class="sound-hint">tap to hear</span><div class="hanja-block"><span class="hanja-sm">${ch.hanja}</span><span class="meaning-sm">${ch.meaning}</span></div>`;
+    row.appendChild(u);
+    show(u, 720 + i*300);
   });
-  const roman = document.getElementById('roman');
-  roman.textContent = data.romanization;
-  show(roman, 720 + data.characters.length * 300 + 100);
-  setTimeout(() => document.getElementById('actionBtns').classList.add('show'), 720 + data.characters.length * 300 + 500);
+  const rom = document.getElementById('roman');
+  rom.textContent = data.romanization;
+  show(rom, 720 + data.characters.length*300 + 100);
+  setTimeout(() => document.getElementById('actionBtns').classList.add('show'), 720 + data.characters.length*300 + 500);
 }
 
 async function handleSubmit() {
@@ -228,302 +205,258 @@ async function handleSubmit() {
   document.getElementById('loader').classList.add('active');
   document.getElementById('results').style.display = 'none';
   try {
-    const res = await fetch('/.netlify/functions/generate', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name })
-    });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+    const res = await fetch('/.netlify/functions/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error||'Error'); }
     const parsed = await res.json();
     document.getElementById('loader').classList.remove('active');
     renderResult(parsed);
-  } catch (err) {
+  } catch(err) {
     document.getElementById('loader').classList.remove('active');
     inp.disabled = false;
     alert('Something went wrong 😢\n' + err.message);
   }
 }
 
-document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') handleSubmit(); });
 window.addEventListener('load', () => document.getElementById('nameInput').focus());
 
-// ── PRACTICE ──
-const STROKE_ORDER = {
-  '도': ['ㅗ먼저','ㄷ다음'],
-  '민': ['ㅣ먼저','ㅡ다음','ㅁ마지막'],
-  '혁': ['ㅕ먼저','ㅎ다음','ㄱ마지막'],
-  '김': ['ㅣ먼저','ㄱ다음','ㅁ마지막'],
-  '이': ['ㅣ먼저','ㅇ다음'],
-  '박': ['ㅏ먼저','ㅂ다음','ㄱ마지막'],
+// ── STROKE DATA ──
+const STROKES = {
+  '가':['M 10 18 L 38 18','M 38 18 L 38 42','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '나':['M 10 10 L 10 52','M 10 52 L 36 52','M 44 10 L 44 52','M 44 30 L 54 30'],
+  '다':['M 10 16 L 38 16','M 10 16 L 10 40','M 10 40 L 38 40','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '도':['M 10 16 L 48 16','M 10 16 L 10 38','M 10 38 L 48 38','M 29 38 L 29 52','M 16 52 L 42 52'],
+  '라':['M 10 10 L 36 10','M 36 10 L 36 28','M 10 28 L 36 28','M 10 10 L 10 28','M 10 28 L 10 44','M 10 44 L 36 44','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '마':['M 10 10 L 10 50','M 10 10 L 36 10','M 36 10 L 36 50','M 10 50 L 36 50','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '민':['M 10 20 L 10 42','M 10 20 L 32 20','M 32 20 L 32 42','M 10 42 L 32 42','M 44 10 L 44 52'],
+  '바':['M 10 10 L 10 50','M 10 10 L 36 10','M 36 10 L 36 50','M 10 30 L 36 30','M 10 50 L 36 50','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '사':['M 18 12 L 10 36','M 18 12 L 26 36','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '서':['M 10 20 L 48 20','M 18 20 L 10 40','M 26 20 L 18 40','M 29 10 L 29 52','M 10 32 L 29 32'],
+  '아':['M 22 18 A 10 10 0 1 1 22.01 18','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '안':['M 20 16 A 8 8 0 1 1 20.01 16','M 38 10 L 38 52','M 38 28 L 50 28','M 14 50 L 50 50','M 14 38 L 14 50'],
+  '자':['M 10 14 L 38 14','M 16 14 L 10 36','M 24 14 L 18 36','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '지':['M 10 14 L 36 14','M 16 14 L 10 34','M 24 14 L 18 34','M 44 10 L 44 52'],
+  '준':['M 10 14 L 34 14','M 16 14 L 10 30','M 24 14 L 18 30','M 29 10 L 29 44','M 16 44 L 42 44','M 14 36 L 44 36','M 14 36 L 14 50','M 14 50 L 44 50'],
+  '채':['M 10 14 L 34 14','M 20 8 L 20 16','M 14 22 L 8 40','M 22 22 L 16 40','M 42 10 L 42 52','M 42 28 L 54 28','M 56 10 L 56 52'],
+  '하':['M 22 8 L 22 18','M 12 18 L 34 18','M 22 22 A 10 10 0 1 1 22.01 22','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '혁':['M 20 8 L 20 18','M 10 18 L 32 18','M 20 22 A 8 8 0 1 1 20.01 22','M 42 10 L 42 52','M 42 24 L 54 24','M 42 36 L 54 36','M 10 46 L 32 46','M 32 46 L 32 54'],
+  '김':['M 10 12 L 36 12','M 36 12 L 36 36','M 44 10 L 44 52','M 14 50 L 44 50','M 14 36 L 14 50','M 14 36 L 44 36','M 44 36 L 44 50'],
+  '이':['M 22 16 A 8 8 0 1 1 22.01 16','M 44 10 L 44 52'],
+  '박':['M 8 10 L 8 50','M 8 10 L 32 10','M 32 10 L 32 50','M 8 30 L 32 30','M 8 50 L 32 50','M 40 10 L 40 52','M 40 28 L 50 28','M 50 28 L 50 42','M 50 42 L 58 42'],
+  '최':['M 10 14 L 34 14','M 20 8 L 20 16','M 14 22 L 8 40','M 22 22 L 16 40','M 42 10 L 42 52','M 42 30 L 54 30','M 50 10 L 50 52'],
+  '정':['M 10 14 L 34 14','M 16 14 L 10 32','M 24 14 L 18 32','M 29 10 L 29 40','M 10 26 L 29 26','M 20 48 A 12 6 0 1 1 20.01 48'],
+  '강':['M 20 12 A 8 8 0 1 1 20.01 12','M 29 10 L 29 38','M 29 26 L 42 26','M 18 50 A 14 6 0 1 1 18.01 50'],
+  '한':['M 20 8 L 20 18','M 10 18 L 34 18','M 20 22 A 8 8 0 1 1 20.01 22','M 40 10 L 40 52','M 40 28 L 52 28','M 16 50 L 44 50','M 16 38 L 16 50'],
+  '윤':['M 20 10 A 8 8 0 1 1 20.01 10','M 29 10 L 29 52','M 14 36 L 29 36','M 14 46 L 29 46','M 14 20 L 44 20','M 14 20 L 14 32','M 14 32 L 44 32'],
+  '수':['M 22 8 L 14 30','M 22 8 L 30 30','M 30 10 L 30 52','M 16 52 L 44 52'],
+  '진':['M 10 14 L 36 14','M 16 14 L 10 32','M 24 14 L 18 32','M 44 10 L 44 52','M 14 44 L 44 44','M 14 32 L 14 44'],
+  '현':['M 20 8 L 20 18','M 10 18 L 32 18','M 20 22 A 8 8 0 1 1 20.01 22','M 40 10 L 40 52','M 40 22 L 52 22','M 40 36 L 52 36','M 14 50 L 44 50','M 14 38 L 14 50'],
+  '예':['M 20 12 A 8 8 0 1 1 20.01 12','M 36 10 L 36 52','M 36 22 L 48 22','M 36 36 L 48 36','M 50 10 L 50 52'],
+  '은':['M 20 12 A 8 8 0 1 1 20.01 12','M 10 34 L 48 34','M 16 50 L 44 50','M 16 38 L 16 50'],
+  '영':['M 20 8 A 8 8 0 1 1 20.01 8','M 29 10 L 29 40','M 29 20 L 42 20','M 29 32 L 42 32','M 14 52 A 14 6 0 1 1 14.01 52'],
+  '연':['M 20 10 A 8 8 0 1 1 20.01 10','M 38 10 L 38 52','M 38 22 L 50 22','M 38 36 L 50 36','M 14 50 L 46 50','M 14 38 L 14 50'],
+  '재':['M 10 14 L 34 14','M 16 14 L 10 32','M 24 14 L 18 32','M 42 10 L 42 52','M 42 28 L 54 28','M 56 10 L 56 52'],
+  '혜':['M 18 8 L 18 18','M 8 18 L 30 18','M 18 22 A 8 8 0 1 1 18.01 22','M 40 10 L 40 52','M 40 26 L 52 26','M 40 38 L 52 38','M 54 10 L 54 52'],
+  '미':['M 20 10 A 8 8 0 1 1 20.01 10','M 44 10 L 44 52','M 20 30 L 44 30'],
+  '선':['M 10 12 L 38 12','M 16 12 L 10 32','M 24 12 L 18 32','M 38 10 L 38 44','M 24 30 L 38 30','M 14 50 L 46 50','M 14 38 L 14 50'],
+  '우':['M 20 8 A 8 8 0 1 1 20.01 8','M 30 10 L 30 52','M 16 52 L 44 52'],
+  '태':['M 10 10 L 36 10','M 10 10 L 10 50','M 10 30 L 36 30','M 10 50 L 36 50','M 44 10 L 44 52','M 44 28 L 56 28','M 58 10 L 58 52'],
+  '호':['M 20 8 A 8 8 0 1 1 20.01 8','M 10 20 L 34 20','M 29 28 L 29 52','M 14 52 L 44 52'],
+  '나':['M 10 10 L 10 52','M 10 52 L 36 52','M 44 10 L 44 52','M 44 28 L 54 28'],
+  '소':['M 29 10 L 29 44','M 16 44 L 42 44','M 14 28 L 44 28'],
+  '유':['M 16 10 L 16 44','M 42 10 L 42 44','M 16 28 L 42 28','M 16 44 L 42 44'],
+  '기':['M 10 18 L 36 18','M 36 18 L 36 44','M 44 10 L 44 52'],
+  '민':['M 10 20 L 10 42','M 10 20 L 32 20','M 32 20 L 32 42','M 10 42 L 32 42','M 44 10 L 44 52'],
+  '해':['M 20 8 A 8 8 0 1 1 20.01 8','M 10 20 L 34 20','M 42 10 L 42 52','M 42 28 L 54 28','M 56 10 L 56 52'],
+  '준':['M 10 14 L 34 14','M 16 14 L 10 30','M 24 14 L 18 30','M 29 10 L 29 44','M 16 44 L 42 44','M 14 36 L 14 52','M 14 52 L 44 52'],
+  '서':['M 10 20 L 48 20','M 18 20 L 10 40','M 26 20 L 18 40','M 29 10 L 29 52','M 10 32 L 29 32'],
+  '나':['M 10 10 L 10 52','M 10 52 L 36 52','M 44 10 L 44 52','M 44 30 L 54 30'],
 };
 
+// ── PRACTICE ──
 function openPractice() {
   document.getElementById('mainPage').style.display = 'none';
   document.getElementById('practicePage').style.display = 'block';
   buildTabs();
+  resizeCanvases();
   selectChar(0);
   setupDrawing();
 }
-
 function closePractice() {
   document.getElementById('practicePage').style.display = 'none';
   document.getElementById('mainPage').style.display = 'flex';
 }
-
 function buildTabs() {
   const tabs = document.getElementById('charTabs');
   tabs.innerHTML = '';
   currentChars.forEach((ch, i) => {
     const t = document.createElement('div');
     t.className = 'char-tab' + (i===0?' active':'');
-    t.style.color = OBANGSAEK[i%OBANGSAEK.length];
+    t.style.color = i===0 ? OBANGSAEK[0] : '#ccc';
     t.textContent = ch.hangul;
     t.onclick = () => selectChar(i);
     tabs.appendChild(t);
   });
 }
-
 function selectChar(i) {
   currentIdx = i;
   const ch = currentChars[i];
   const color = OBANGSAEK[i%OBANGSAEK.length];
   document.querySelectorAll('.char-tab').forEach((t,j) => {
     t.classList.toggle('active', j===i);
-    t.style.color = j===i ? OBANGSAEK[j%OBANGSAEK.length] : '#aaa';
+    t.style.color = j===i ? OBANGSAEK[j%OBANGSAEK.length] : '#ccc';
   });
-  document.getElementById('practiceCharBig').textContent = ch.hangul;
-  document.getElementById('practiceCharBig').style.color = color;
-  document.getElementById('practiceHanja').textContent = ch.hanja;
-  document.getElementById('practiceMeaning').textContent = ch.meaning;
-  document.getElementById('scoreDisplay').textContent = '';
+  document.getElementById('charBig').textContent = ch.hangul;
+  document.getElementById('charBig').style.color = color;
+  document.getElementById('charHanja').textContent = ch.hanja;
+  document.getElementById('charMeaning').textContent = ch.meaning;
+  document.getElementById('scoreText').textContent = '';
   document.getElementById('scoreFill').style.width = '0';
   document.getElementById('scoreFill').style.background = color;
+  resizeCanvases();
   drawGuide(ch.hangul, color);
   clearDraw();
-  buildStrokeOrder(ch.hangul, color);
+  buildStrokeSteps(ch.hangul, color);
 }
 
 function resizeCanvases() {
   const wrap = document.getElementById('canvasWrap');
-  const size = wrap.offsetWidth;
+  const s = wrap.offsetWidth;
   ['guideCanvas','drawCanvas'].forEach(id => {
     const c = document.getElementById(id);
-    c.width = size; c.height = size;
+    c.width = s; c.height = s;
   });
 }
 
 function drawGuide(char, color) {
-  resizeCanvases();
   const canvas = document.getElementById('guideCanvas');
   const ctx = canvas.getContext('2d');
   const s = canvas.width;
   ctx.clearRect(0,0,s,s);
-
-  // 공책 그리드
-  ctx.strokeStyle = 'rgba(150,130,110,0.25)';
-  ctx.lineWidth = 0.5;
   const cell = Math.floor(s/8);
-  for (let x=0; x<=s; x+=cell) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,s); ctx.stroke(); }
-  for (let y=0; y<=s; y+=cell) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(s,y); ctx.stroke(); }
-  ctx.strokeStyle = 'rgba(150,130,110,0.1)';
-  for (let x=cell/2; x<=s; x+=cell) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,s); ctx.stroke(); }
-  for (let y=cell/2; y<=s; y+=cell) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(s,y); ctx.stroke(); }
-
-  // 중앙 십자선
-  ctx.strokeStyle = 'rgba(150,130,110,0.15)';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(s/2,0); ctx.lineTo(s/2,s); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(0,s/2); ctx.lineTo(s,s/2); ctx.stroke();
+  ctx.strokeStyle = 'rgba(150,130,110,0.2)';
+  ctx.lineWidth = 0.5;
+  for (let x=0;x<=s;x+=cell){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,s);ctx.stroke();}
+  for (let y=0;y<=s;y+=cell){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(s,y);ctx.stroke();}
+  ctx.strokeStyle='rgba(150,130,110,0.08)';
+  for(let x=cell/2;x<=s;x+=cell){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,s);ctx.stroke();}
+  for(let y=cell/2;y<=s;y+=cell){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(s,y);ctx.stroke();}
+  ctx.strokeStyle='rgba(180,160,140,0.12)'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(s/2,0);ctx.lineTo(s/2,s);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,s/2);ctx.lineTo(s,s/2);ctx.stroke();
 
   // 가이드 글자
   ctx.fillStyle = color;
   ctx.font = `900 ${Math.floor(s*0.82)}px 'Noto Sans KR', sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(char, s/2, s/2 + s*0.03);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(char, s/2, s/2+s*0.03);
 }
 
-function buildStrokeOrder(char, color) {
+function buildStrokeSteps(char, color) {
   const container = document.getElementById('strokeSteps');
   container.innerHTML = '';
-  const strokeData = getStrokeData(char);
-  strokeData.forEach((strokes, i) => {
+  const strokes = STROKES[char];
+  if (!strokes) {
+    const msg = document.createElement('div');
+    msg.className = 'no-stroke-msg';
+    msg.textContent = 'Stroke data coming soon';
+    container.appendChild(msg);
+    return;
+  }
+  strokes.forEach((_, i) => {
     const step = document.createElement('div');
-    step.className = 'stroke-step';
-    const c = document.createElement('canvas');
-    c.className = 'stroke-canvas';
-    c.width = 56; c.height = 56;
-    step.appendChild(c);
+    step.className = 'stroke-step' + (i===strokes.length-1?' current':'');
+    step.onclick = () => highlightStroke(i, strokes, color);
+    const SZ = 52;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('width', SZ); svg.setAttribute('height', SZ);
+    svg.setAttribute('viewBox','0 0 60 60');
+    // 이전 획 — 연하게
+    strokes.slice(0,i).forEach(d => {
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d',d); p.setAttribute('stroke',color);
+      p.setAttribute('stroke-width','3'); p.setAttribute('stroke-linecap','round');
+      p.setAttribute('stroke-linejoin','round'); p.setAttribute('fill','none');
+      p.setAttribute('opacity','0.18');
+      svg.appendChild(p);
+    });
+    // 현재 획 — 진하게
+    const curr = document.createElementNS('http://www.w3.org/2000/svg','path');
+    curr.setAttribute('d',strokes[i]); curr.setAttribute('stroke',color);
+    curr.setAttribute('stroke-width','3.5'); curr.setAttribute('stroke-linecap','round');
+    curr.setAttribute('stroke-linejoin','round'); curr.setAttribute('fill','none');
+    svg.appendChild(curr);
+    // 시작점 빨간 점
+    const m = strokes[i].match(/M\s*([\d.]+)\s+([\d.]+)/);
+    if (m) {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx',m[1]); dot.setAttribute('cy',m[2]);
+      dot.setAttribute('r','3'); dot.setAttribute('fill','#C84B31');
+      svg.appendChild(dot);
+    }
+    step.appendChild(svg);
     const num = document.createElement('div');
     num.className = 'stroke-num';
-    num.textContent = i + 1;
+    num.textContent = i+1;
     step.appendChild(num);
     container.appendChild(step);
-    drawStrokeStep(c, char, strokes, color, i === strokeData.length - 1);
   });
 }
 
-function getStrokeData(char) {
-  // 한글 획순 데이터 — 누적 획수로 표현
-  const strokeMap = {
-    '도': [1, 2, 3, 4],
-    '민': [1, 2, 3, 4, 5],
-    '혁': [1, 2, 3, 4, 5, 6],
-    '김': [1, 2, 3, 4, 5],
-    '이': [1, 2, 3],
-    '박': [1, 2, 3, 4, 5, 6],
-    '서': [1, 2, 3, 4],
-    '준': [1, 2, 3, 4, 5],
-    '윤': [1, 2, 3, 4, 5],
-    '지': [1, 2, 3, 4],
-    '현': [1, 2, 3, 4, 5, 6],
-    '안': [1, 2, 3, 4],
-    '나': [1, 2, 3],
-    '예': [1, 2, 3, 4, 5],
-  };
-  const count = strokeMap[char] || [1,2,3,4];
-  return count;
-}
-
-function drawStrokeStep(canvas, char, strokeNum, color, isFinal) {
-  const ctx = canvas.getContext('2d');
-  const s = canvas.width;
-  ctx.clearRect(0,0,s,s);
-
-  // 전체 글자 연하게
-  ctx.globalAlpha = 0.12;
-  ctx.fillStyle = color;
-  ctx.font = `900 ${Math.floor(s*0.82)}px 'Noto Sans KR', sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(char, s/2, s/2 + s*0.03);
-
-  // 현재까지의 획 강조 (클리핑으로 부분 표시)
-  ctx.globalAlpha = 1;
-  ctx.save();
-  // 획 번호에 따라 글자의 일부를 강조
-  const progress = strokeNum / (getStrokeData(char).length);
-  ctx.globalAlpha = isFinal ? 1 : 0.9;
-  ctx.fillStyle = color;
-
-  // 클리핑 영역 — 글자 진행도에 따라
-  ctx.beginPath();
-  ctx.rect(0, s * (1 - progress) * 0.3, s, s);
-  ctx.clip();
-  ctx.fillText(char, s/2, s/2 + s*0.03);
-  ctx.restore();
-
-  // 획 번호 표시
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = color;
-  ctx.font = `bold ${Math.floor(s*0.22)}px 'Bebas Neue', sans-serif`;
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'top';
-  ctx.fillText(strokeNum, s - 3, 2);
-}
-
-async function initGuide() {
-  await document.fonts.load("900 40px 'Noto Sans KR'");
-  if (currentChars.length > 0) selectChar(currentIdx);
+function highlightStroke(i, strokes, color) {
+  document.querySelectorAll('.stroke-step').forEach((s,j) => s.classList.toggle('current', j===i));
 }
 
 function clearDraw() {
   const c = document.getElementById('drawCanvas');
   c.getContext('2d').clearRect(0,0,c.width,c.height);
-  document.getElementById('scoreDisplay').textContent = '';
+  document.getElementById('scoreText').textContent = '';
   document.getElementById('scoreFill').style.width = '0';
 }
 
 function scoreDrawing() {
-  const guide = document.getElementById('guideCanvas');
-  const draw = document.getElementById('drawCanvas');
-  const gs = guide.width;
-  const gctx = guide.getContext('2d');
-  const dctx = draw.getContext('2d');
-
-  const gData = gctx.getImageData(0, 0, gs, gs).data;
-  const dData = dctx.getImageData(0, 0, gs, gs).data;
-
-  // 가이드에서 글자 픽셀 추출 (불투명한 픽셀)
-  let guidePixels = 0, overlap = 0, drawTotal = 0;
-  for (let i = 3; i < gData.length; i += 4) {
-    if (gData[i] > 30) guidePixels++;
-    if (dData[i] > 30) {
-      drawTotal++;
-      if (gData[i] > 30) overlap++;
-    }
+  const g = document.getElementById('guideCanvas');
+  const d = document.getElementById('drawCanvas');
+  const gd = g.getContext('2d').getImageData(0,0,g.width,g.height).data;
+  const dd = d.getContext('2d').getImageData(0,0,d.width,d.height).data;
+  let guideP=0, overlap=0, drawP=0;
+  for (let i=3;i<gd.length;i+=4) {
+    if(gd[i]>30) guideP++;
+    if(dd[i]>30){ drawP++; if(gd[i]>30) overlap++; }
   }
-
-  if (drawTotal === 0) {
-    document.getElementById('scoreDisplay').textContent = 'Draw something first!';
-    return;
-  }
-
-  // 점수: 겹침 비율 + 정확도
-  const coverage = guidePixels > 0 ? Math.min(overlap / guidePixels, 1) : 0;
-  const precision = drawTotal > 0 ? Math.min(overlap / drawTotal, 1) : 0;
-  const rawScore = (coverage * 0.6 + precision * 0.4) * 100;
-  const score = Math.round(Math.min(rawScore * 1.4, 100));
-
-  const color = OBANGSAEK[currentIdx % OBANGSAEK.length];
-  const fill = document.getElementById('scoreFill');
-  fill.style.background = color;
-  fill.style.width = score + '%';
-
-  let msg = '';
-  if (score >= 85) msg = `${score} — 완벽해요! Perfect!`;
-  else if (score >= 65) msg = `${score} — 잘했어요! Good job!`;
-  else if (score >= 40) msg = `${score} — 다시 해봐요! Try again!`;
-  else msg = `${score} — 연습이 필요해요! Keep practicing!`;
-
-  document.getElementById('scoreDisplay').textContent = msg;
+  if (drawP===0) { document.getElementById('scoreText').textContent='Draw something first!'; return; }
+  const coverage = guideP>0 ? Math.min(overlap/guideP,1) : 0;
+  const precision = drawP>0 ? Math.min(overlap/drawP,1) : 0;
+  const score = Math.round(Math.min((coverage*0.6+precision*0.4)*140, 100));
+  const color = OBANGSAEK[currentIdx%OBANGSAEK.length];
+  document.getElementById('scoreFill').style.background = color;
+  document.getElementById('scoreFill').style.width = score+'%';
+  const msgs = ['Keep practicing! 연습이 필요해요','Try again! 다시 해봐요','Getting there! 잘하고 있어요','Good job! 잘했어요','Perfect! 완벽해요'];
+  const msgIdx = score>=85?4:score>=65?3:score>=45?2:score>=25?1:0;
+  document.getElementById('scoreText').textContent = `${score} — ${msgs[msgIdx]}`;
 }
 
-// ── DRAWING ──
 function getPos(e, canvas) {
   const rect = canvas.getBoundingClientRect();
-  const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
-  if (e.touches) return { x:(e.touches[0].clientX-rect.left)*sx, y:(e.touches[0].clientY-rect.top)*sy };
-  return { x:(e.clientX-rect.left)*sx, y:(e.clientY-rect.top)*sy };
+  const sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+  if(e.touches) return {x:(e.touches[0].clientX-rect.left)*sx,y:(e.touches[0].clientY-rect.top)*sy};
+  return {x:(e.clientX-rect.left)*sx,y:(e.clientY-rect.top)*sy};
 }
 
 function setupDrawing() {
   const canvas = document.getElementById('drawCanvas');
   const ctx = canvas.getContext('2d');
-  ctx.strokeStyle = '#0a0a0a';
-  ctx.lineWidth = 8;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  function start(e) {
-    e.preventDefault(); isDrawing = true;
-    const p = getPos(e, canvas);
-    lastX = p.x; lastY = p.y;
-    ctx.beginPath(); ctx.arc(lastX,lastY,4,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill();
-  }
-  function draw(e) {
-    e.preventDefault(); if (!isDrawing) return;
-    const p = getPos(e, canvas);
-    ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke();
-    lastX=p.x; lastY=p.y;
-  }
-  function stop(e) { e.preventDefault(); isDrawing=false; }
-
-  canvas.removeEventListener('mousedown', canvas._start);
-  canvas._start = start;
-  canvas.addEventListener('mousedown', start);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stop);
-  canvas.addEventListener('mouseleave', stop);
-  canvas.addEventListener('touchstart', start, {passive:false});
-  canvas.addEventListener('touchmove', draw, {passive:false});
-  canvas.addEventListener('touchend', stop, {passive:false});
+  ctx.strokeStyle='#0a0a0a'; ctx.lineWidth=8; ctx.lineCap='round'; ctx.lineJoin='round';
+  const start = e => { e.preventDefault(); isDrawing=true; const p=getPos(e,canvas); lastX=p.x; lastY=p.y; ctx.beginPath(); ctx.arc(lastX,lastY,4,0,Math.PI*2); ctx.fillStyle='#0a0a0a'; ctx.fill(); };
+  const draw = e => { e.preventDefault(); if(!isDrawing) return; const p=getPos(e,canvas); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; };
+  const stop = e => { e.preventDefault(); isDrawing=false; };
+  canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',draw);
+  canvas.addEventListener('mouseup',stop); canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',draw,{passive:false});
+  canvas.addEventListener('touchend',stop,{passive:false});
 }
 
-window.addEventListener('resize', () => {
-  if (document.getElementById('practicePage').style.display !== 'none') {
-    if (currentChars.length > 0) selectChar(currentIdx);
-  }
-});
+window.addEventListener('resize', () => { if(document.getElementById('practicePage').style.display!=='none') selectChar(currentIdx); });
 </script>
 </body>
 </html>
