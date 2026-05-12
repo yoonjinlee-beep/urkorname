@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>나의 한국 이름</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -17,15 +17,15 @@
       --nj-cream:  #C8960C;
       --nj-dim:    rgba(10,10,10,0.5);
       --nj-border: rgba(10,10,10,0.15);
-      --font-display: 'Bebas Neue', sans-serif;
+      --font-display: 'Inter', sans-serif;
       --font-korean: 'Noto Sans KR', sans-serif;
     }
     html, body { min-height: 100%; background: #ffffff; color: #0a0a0a; font-family: var(--font-display); -webkit-font-smoothing: antialiased; }
 
     #mainPage { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem clamp(1.5rem, 8vw, 8rem) 6rem; text-align: center; position: relative; z-index: 2; }
-    .site-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #aaa; margin-bottom: 5rem; opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards; }
-    .input-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #aaa; margin-bottom: 0.6rem; opacity: 0; animation: fadeUp 0.9s 0.2s ease forwards; }
-    #nameInput { font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 4.5rem); color: var(--nj-teal); background: transparent; border: none; border-bottom: 1px solid var(--nj-border); outline: none; width: 100%; max-width: 500px; padding-bottom: 0.4rem; text-align: center; letter-spacing: 0.08em; transition: border-color 0.25s; caret-color: var(--nj-teal); opacity: 0; animation: fadeUp 0.9s 0.25s ease forwards; }
+    .site-title { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #aaa; margin-bottom: 5rem; opacity: 0; animation: fadeUp 0.9s 0.1s ease forwards; }
+    .input-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa; margin-bottom: 0.6rem; opacity: 0; animation: fadeUp 0.9s 0.2s ease forwards; }
+    #nameInput { font-family: var(--font-display); font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 700; color: var(--nj-teal); background: transparent; border: none; border-bottom: 1px solid var(--nj-border); outline: none; width: 100%; max-width: 500px; padding-bottom: 0.4rem; text-align: center; letter-spacing: 0; transition: border-color 0.25s; caret-color: var(--nj-teal); opacity: 0; animation: fadeUp 0.9s 0.25s ease forwards; }
     #nameInput:focus { border-bottom-color: #0a0a0a; }
     #nameInput::placeholder { color: #e0e0e0; }
     #nameInput:disabled { opacity: 0.35; }
@@ -37,34 +37,34 @@
     .loader-dot:nth-child(2) { background: #C84B31;  animation-delay: 0.22s; }
     .loader-dot:nth-child(3) { background: var(--nj-green); animation-delay: 0.44s; }
     #results { display: none; width: 100%; max-width: 640px; }
-    .step-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #ccc; margin-bottom: 0.4rem; }
-    #translit { font-family: var(--font-korean); font-size: clamp(1rem, 2vw, 1.3rem); color: #ccc; margin-bottom: 2rem; opacity: 0; transform: translateY(8px); transition: opacity 0.6s, transform 0.6s; }
+    .step-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; margin-bottom: 0.6rem; font-weight: 500; }
+    #translit { font-family: var(--font-korean); font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 300; color: #ccc; margin-bottom: 2rem; opacity: 0; transform: translateY(8px); transition: opacity 0.6s, transform 0.6s; }
     #translit.show { opacity: 1; transform: translateY(0); }
     #divider { width: 32px; height: 1px; background: #e0e0e0; margin: 0 auto 2rem; opacity: 0; transition: opacity 0.5s 0.35s; }
     #divider.show { opacity: 1; }
     #koreanRow { display: flex; justify-content: center; gap: clamp(0.5rem, 3vw, 1.5rem); margin-bottom: 0.8rem; }
     .char-unit { display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(14px); transition: opacity 0.45s, transform 0.45s; cursor: pointer; }
     .char-unit.show { opacity: 1; transform: translateY(0); }
-    .hangul-char { font-family: var(--font-korean); font-weight: 900; font-size: clamp(4rem, 12vw, 7rem); line-height: 1; transition: transform 0.15s ease, opacity 0.15s ease; display: block; }
+    .hangul-char { font-family: var(--font-korean); font-weight: 900; font-size: clamp(5rem, 15vw, 9rem); line-height: 1; transition: transform 0.15s ease, opacity 0.15s ease; display: block; }
     .char-unit:hover .hangul-char { transform: scale(1.06); opacity: 0.75; }
     .sound-hint { font-size: 8px; letter-spacing: 0.1em; color: var(--nj-dim); text-transform: uppercase; margin-top: 2px; opacity: 0; transition: opacity 0.2s; font-family: var(--font-display); }
     .char-unit:hover .sound-hint { opacity: 1; }
     .hanja-block { display: flex; flex-direction: column; align-items: center; margin-top: 8px; gap: 2px; }
-    .hanja-sm { font-family: var(--font-korean); font-size: 0.8rem; color: #aaa; line-height: 1; }
-    .meaning-sm { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); }
-    #roman { font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase; color: #bbb; margin-bottom: 2.5rem; font-family: var(--font-display); opacity: 0; transition: opacity 0.5s; }
+    .hanja-sm { font-family: var(--font-korean); font-size: 0.9rem; color: #aaa; line-height: 1; }
+    .meaning-sm { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); }
+    #roman { font-size: 0.9rem; letter-spacing: 0.15em; text-transform: uppercase; color: #bbb; font-weight: 400; margin-bottom: 2.5rem; font-family: var(--font-display); opacity: 0; transition: opacity 0.5s; }
     #roman.show { opacity: 1; }
     .action-btns { display: flex; gap: 1.5rem; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s; flex-wrap: wrap; }
     .action-btns.show { opacity: 1; }
-    .btn-primary { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; background: transparent; color: var(--nj-teal); border: none; border-bottom: 1.5px solid #e0e0e0; padding: 11px 24px; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { font-family: var(--font-display); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; color: var(--nj-teal); border: none; border-bottom: 1.5px solid #e0e0e0; padding: 11px 24px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn-primary:hover { background: #C84B31; }
-    .btn-ghost { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 0; }
+    .btn-ghost { font-family: var(--font-display); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #ccc; background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 0; font-weight: 400; }
     .btn-ghost:hover { color: #0a0a0a; }
 
     /* PRACTICE */
     #practicePage { display: none; min-height: 100vh; padding: 4rem clamp(1.5rem, 6vw, 6rem); max-width: 860px; margin: 0 auto; position: relative; z-index: 2; }
     .prac-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
-    .prac-title { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--nj-dim); }
+    .prac-title { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa; font-weight: 500; }
     .char-tab { font-family: var(--font-korean); font-weight: 900; font-size: 2rem; cursor: pointer; padding: 0.3rem 0.8rem; border-bottom: 2px solid transparent; transition: all 0.2s; color: #aaa; }
     .char-tab.active { border-bottom-color: currentColor; }
     .prac-body { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: start; }
@@ -83,8 +83,8 @@
     .score-bar { height: 2px; background: #f0f0f0; overflow: hidden; }
     .score-fill { height: 100%; width: 0; transition: width 0.9s cubic-bezier(.4,0,.2,1); }
     .info-section { padding-top: 0.3rem; }
-    .char-big { font-family: var(--font-korean); font-weight: 900; font-size: 6.5rem; line-height: 1; margin-bottom: 0.6rem; }
-    .char-hanja { font-family: var(--font-korean); font-size: 1.1rem; color: #aaa; margin-bottom: 0.2rem; }
+    .char-big { font-family: var(--font-korean); font-weight: 900; font-size: 8rem; line-height: 1; margin-bottom: 0.6rem; }
+    .char-hanja { font-family: var(--font-korean); font-size: 1.4rem; color: #aaa; margin-bottom: 0.2rem; }
     .char-meaning { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 2rem; }
     .strokes-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #ccc; font-family: var(--font-display); margin-bottom: 0.8rem; }
     .stroke-steps { display: flex; gap: 0.4rem; flex-wrap: wrap; }
@@ -99,11 +99,17 @@
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
     @keyframes pulse { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
+
+    /* 별 인터랙션 */
+    #starStage { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    #starStage.active { pointer-events: all; }
+    .star { position: absolute; top: 0; left: 0; transform-origin: center; will-change: transform; opacity: 0.45; }
+    #mainPage, #practicePage { position: relative; z-index: 1; }
   </style>
 </head>
 <body>
+<div id="starStage"></div>
 
-<div id="mainPage">
   <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
   <div class="input-label">Enter your name</div>
   <input id="nameInput" type="text" placeholder="e.g. Dominic" autocomplete="off" spellcheck="false" />
@@ -544,6 +550,68 @@ function setupDrawing() {
 }
 
 window.addEventListener('resize', () => { if(document.getElementById('practicePage').style.display!=='none') selectChar(currentIdx); });
+
+// ── 별 인터랙션 배경 ──
+try { (function() {
+  var stage = document.getElementById('starStage');
+  if (!stage) return;
+  var SHAPES = [
+    function(c,s){return '<svg xmlns="http://www.w3.org/2000/svg" width="'+s+'" height="'+s+'" viewBox="0 0 125 125" style="isolation:isolate"><rect style="fill:'+c[0]+';mix-blend-mode:multiply" x="26" y="45" width="73" height="35"/><rect style="fill:'+c[1]+';mix-blend-mode:multiply" x="26" y="45" width="73" height="35" transform="rotate(90,62,62)"/><rect style="fill:'+c[2]+';mix-blend-mode:multiply" x="26" y="45" width="73" height="35" transform="rotate(45,62,62)"/><rect style="fill:'+c[2]+';mix-blend-mode:multiply" x="26" y="45" width="73" height="35" transform="rotate(135,62,62)"/></svg>';},
+    function(c,s){return '<svg xmlns="http://www.w3.org/2000/svg" width="'+s+'" height="'+s+'" viewBox="0 0 125 125" style="isolation:isolate"><rect style="fill:'+c[0]+';mix-blend-mode:multiply" x="26" y="57" width="73" height="11" rx="5" transform="rotate(90,62,62)"/><rect style="fill:'+c[1]+';mix-blend-mode:multiply" x="26" y="57" width="73" height="11" rx="5" transform="rotate(135,62,62)"/><rect style="fill:'+c[2]+';mix-blend-mode:multiply" x="26" y="57" width="73" height="11" rx="5"/><rect style="fill:'+c[1]+';mix-blend-mode:multiply" x="26" y="57" width="73" height="11" rx="5" transform="rotate(45,62,62)"/></svg>';},
+    function(c,s){return '<svg xmlns="http://www.w3.org/2000/svg" width="'+s+'" height="'+s+'" viewBox="0 0 125 125" style="isolation:isolate"><rect style="fill:'+c[0]+';mix-blend-mode:multiply" x="26" y="54" width="73" height="17" transform="rotate(90,62,62)"/><rect style="fill:'+c[1]+';mix-blend-mode:multiply" x="26" y="57" width="73" height="11" transform="rotate(135,62,62)"/><rect style="fill:'+c[1]+';mix-blend-mode:multiply" x="26" y="57" width="73" height="11" transform="rotate(45,62,62)"/><rect style="fill:'+c[2]+';mix-blend-mode:multiply" x="26" y="58" width="73" height="8"/></svg>';}
+  ];
+  var PALETTES = [
+    ['#4eff58','#d79eff','#6e84ff'],['#ff992c','#ff84f1','#fff82a'],
+    ['#54d9ff','#cfff93','#f9b8ff'],['#ff4444','#ffa500','#ffee00'],
+    ['#1a8aff','#44ff88','#ffe500'],['#ff44cc','#aa44ff','#ffaa00'],
+    ['#00cfff','#7b5fff','#ff6eb0'],['#ff6600','#ffcc00','#ff3388'],
+    ['#ff3366','#ffcc00','#66ffaa'],['#ff44aa','#66ff66','#ffcc33'],
+  ];
+  var stars = [], mx = window.innerWidth/2, my = window.innerHeight/2;
+
+  function init() {
+    var W=window.innerWidth, H=window.innerHeight;
+    stage.innerHTML=''; stars=[];
+    var n = Math.min(Math.floor(W*H/35000)+8, 20);
+    for (var i=0;i<n;i++) {
+      var sh=Math.floor(Math.random()*3), pal=PALETTES[Math.floor(Math.random()*PALETTES.length)];
+      var sz=60+Math.random()*110;
+      var el=document.createElement('div'); el.className='star';
+      el.innerHTML=SHAPES[sh](pal,sz); stage.appendChild(el);
+      stars.push({el:el,size:sz,x:Math.random()*W,y:Math.random()*H,
+        vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,
+        rot:Math.random()*360,rotV:(Math.random()-.5)*.25,scale:1,ts:1});
+    }
+  }
+
+  window.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;});
+  window.addEventListener('click',function(e){
+    stars.forEach(function(s){
+      var dx=s.x-e.clientX,dy=s.y-e.clientY,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<220&&d>0){var f=(220-d)/220*10;s.vx+=dx/d*f;s.vy+=dy/d*f;}
+    });
+  });
+
+  function tick() {
+    var W=window.innerWidth,H=window.innerHeight;
+    stars.forEach(function(s){
+      var dx=s.x-mx,dy=s.y-my,d=Math.sqrt(dx*dx+dy*dy),r=130;
+      if(d<r&&d>0){var f=(r-d)/r*1.8;s.vx+=dx/d*f;s.vy+=dy/d*f;s.ts=1+f*.12;}
+      else s.ts=1;
+      s.vx*=.96;s.vy*=.96;s.scale+=(s.ts-s.scale)*.1;
+      s.x+=s.vx;s.y+=s.vy;s.rot+=s.rotV;
+      var h=s.size/2;
+      if(s.x<h){s.x=h;s.vx=Math.abs(s.vx);}
+      if(s.x>W-h){s.x=W-h;s.vx=-Math.abs(s.vx);}
+      if(s.y<h){s.y=h;s.vy=Math.abs(s.vy);}
+      if(s.y>H-h){s.y=H-h;s.vy=-Math.abs(s.vy);}
+      s.el.style.transform='translate('+(s.x-h)+'px,'+(s.y-h)+'px) rotate('+s.rot+'deg) scale('+s.scale+')';
+    });
+    requestAnimationFrame(tick);
+  }
+  window.addEventListener('resize',init);
+  init(); tick();
+})(); } catch(e) { console.warn('Stars:',e); }
 
 
 
