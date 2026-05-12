@@ -96,16 +96,12 @@
     .no-stroke-msg { font-size: 10px; color: #ddd; font-family: var(--font-display); letter-spacing: 0.08em; }
     .back-btn-wrap { margin-top: 2.5rem; }
 
-    /* 나전칠기 배경 캔버스 */
-    #njBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-    #mainPage, #practicePage { position: relative; z-index: 1; }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
     @keyframes pulse { 0%,80%,100%{transform:scale(0.5);opacity:0.3} 40%{transform:scale(1);opacity:1} }
   </style>
 </head>
 <body>
-<canvas id="njBg"></canvas>
 
 <div id="mainPage">
   <div class="site-title">나의 한국 이름 &mdash; My Korean Name</div>
@@ -164,124 +160,6 @@
 
 <script>
 const OBANGSAEK = ['#1A4A8A','#C84B31','#C8960C','#2E7D32','#555'];
-
-  // ── 나전칠기 배경 ──
-  try { (function() {
-    var c = document.getElementById('njBg');
-    if (!c) return;
-    var ctx = c.getContext('2d');
-    var NJ = ['#1A4A8A','#C84B31','#C8960C','#2E7D32','#6a3a9a','#C84B31','#1A4A8A'];
-
-    function resize() { c.width = window.innerWidth; c.height = window.innerHeight; draw(); }
-    window.addEventListener('resize', resize);
-
-    function draw() {
-      var W = c.width, H = c.height;
-      ctx.clearRect(0,0,W,H);
-
-      // 모란꽃
-      function peony(x,y,r,col) {
-        ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = 0.8;
-        [1, 0.68, 0.42].forEach(function(sc, li) {
-          var n = li===0?12:li===1?8:5;
-          for (var i=0;i<n;i++) {
-            var a=(i/n)*Math.PI*2+li*0.4;
-            ctx.globalAlpha = 0.12+li*0.06;
-            ctx.beginPath();
-            ctx.ellipse(x+Math.cos(a)*r*sc*0.52,y+Math.sin(a)*r*sc*0.52,r*sc*0.26,r*sc*0.14,a,0,Math.PI*2);
-            ctx.stroke();
-            ctx.globalAlpha = 0.04+li*0.02; ctx.fillStyle=col; ctx.fill();
-          }
-        });
-        ctx.globalAlpha=0.2; ctx.beginPath(); ctx.arc(x,y,r*0.25,0,Math.PI*2); ctx.stroke();
-        ctx.globalAlpha=0.25; ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r*0.1,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
-
-      // 당초 덩굴
-      function tendril(x,y,len,col,dir) {
-        ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=0.8; ctx.globalAlpha=0.18;
-        ctx.beginPath();
-        for (var i=0;i<24;i++) {
-          var t=i/23;
-          var px=x+dir*len*t+Math.cos(t*Math.PI*3.5)*14;
-          var py=y-len*0.25*Math.sin(t*Math.PI)+Math.sin(t*Math.PI*5)*12;
-          i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
-        }
-        ctx.stroke();
-        for (var j=2;j<22;j+=3) {
-          var t2=j/23;
-          var lx=x+dir*len*t2+Math.cos(t2*Math.PI*3.5)*14;
-          var ly=y-len*0.25*Math.sin(t2*Math.PI)+Math.sin(t2*Math.PI*5)*12;
-          var la=t2*Math.PI*3.5+(dir>0?0.5:-0.5);
-          ctx.globalAlpha=0.12; ctx.fillStyle=col;
-          ctx.beginPath(); ctx.ellipse(lx,ly,9,4,la,0,Math.PI*2); ctx.fill();
-          ctx.globalAlpha=0.2; ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      // 봉황
-      function phoenix(x,y,s,col) {
-        ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=0.8; ctx.globalAlpha=0.15;
-        ctx.beginPath();
-        ctx.ellipse(x,y,s*0.22,s*0.1,0.3,0,Math.PI*2); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x-s*0.08,y-s*0.04);
-        ctx.bezierCurveTo(x-s*0.38,y-s*0.28,x-s*0.55,y-s*0.08,x-s*0.48,y+s*0.12); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x+s*0.08,y-s*0.04);
-        ctx.bezierCurveTo(x+s*0.38,y-s*0.28,x+s*0.55,y-s*0.08,x+s*0.48,y+s*0.12); ctx.stroke();
-        for (var i=-2;i<=2;i++) {
-          ctx.beginPath();
-          ctx.moveTo(x+i*s*0.05,y+s*0.1);
-          ctx.bezierCurveTo(x+i*s*0.1,y+s*0.22,x+i*s*0.16,y+s*0.34,x+i*s*0.07,y+s*0.44); ctx.stroke();
-        }
-        ctx.beginPath(); ctx.arc(x+s*0.18,y-s*0.09,s*0.05,0,Math.PI*2); ctx.stroke();
-        ctx.restore();
-      }
-
-      // 테두리 자개 장식
-      function border() {
-        ctx.save();
-        var step=36;
-        for (var i=0;i<W;i+=step) {
-          ctx.globalAlpha=0.14; ctx.strokeStyle=NJ[Math.floor(i/step)%NJ.length]; ctx.lineWidth=0.8;
-          ctx.beginPath(); ctx.arc(i+step/2,18,5,0,Math.PI*2); ctx.stroke();
-          ctx.globalAlpha=0.05; ctx.fillStyle=ctx.strokeStyle; ctx.fill();
-          ctx.beginPath(); ctx.arc(i+step/2,H-18,5,0,Math.PI*2); ctx.stroke();
-          ctx.globalAlpha=0.04; ctx.fill();
-        }
-        for (var j=40;j<H-40;j+=step) {
-          ctx.globalAlpha=0.1; ctx.strokeStyle=NJ[Math.floor(j/step)%NJ.length]; ctx.lineWidth=0.8;
-          ctx.beginPath(); ctx.arc(16,j+step/2,4,0,Math.PI*2); ctx.stroke();
-          ctx.beginPath(); ctx.arc(W-16,j+step/2,4,0,Math.PI*2); ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      border();
-
-      // 모란꽃 배치
-      [[80,75,58,'#a8e8e0'],[W-75,95,52,'#d4b896'],[65,H-85,55,'#c0e8b8'],
-       [W-85,H-75,60,'#e8c8d8'],[W/2-110,45,40,'#b8d0e8'],[W/2+95,H-55,46,'#d0b8e8'],
-       [150,H/2-30,38,'#e8e0a0'],[W-120,H/2+40,44,'#b8e8d0'],[W/2+20,H*0.75,34,'#a8e8e0'],
-       [W*0.3,H*0.2,30,'#d4b896'],[W*0.75,H*0.35,36,'#c0e8b8']
-      ].forEach(function(p){peony(p[0],p[1],p[2],p[3]);});
-
-      // 덩굴
-      [[0,H*0.3,W*0.38,'#a8e8e0',1],[W,H*0.55,W*0.38,'#d4b896',-1],
-       [0,H*0.72,W*0.28,'#c0e8b8',1],[W,H*0.18,W*0.3,'#e8c8d8',-1],
-       [0,H*0.9,W*0.22,'#b8d0e8',1]
-      ].forEach(function(p){tendril(p[0],p[1],p[2],p[3],p[4]);});
-
-      // 봉황
-      [[W*0.2,H*0.22,65,'#d4b896'],[W*0.78,H*0.72,58,'#a8e8e0'],[W*0.72,H*0.18,52,'#e8c8d8'],[W*0.15,H*0.7,48,'#b8d0e8']
-      ].forEach(function(p){phoenix(p[0],p[1],p[2],p[3]);});
-    }
-
-    resize();
-  })(); } catch(e) { console.warn('NJ BG:', e); }
 
   // ── 자개빛 글자 렌더링 ──
   function shiftHue(hex,deg) {
